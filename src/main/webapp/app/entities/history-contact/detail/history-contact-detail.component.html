@@ -1,0 +1,54 @@
+<div class="row justify-content-center">
+  <div class="col-8">
+    <div *ngIf="historyContact">
+      <h2 data-cy="historyContactDetailsHeading">
+        <span jhiTranslate="beToeicOnlineApp.historyContact.detail.title">History Contact</span>
+      </h2>
+
+      <hr />
+
+      <jhi-alert-error></jhi-alert-error>
+
+      <jhi-alert></jhi-alert>
+
+      <dl class="row-md jh-entity-details">
+        <dt><span jhiTranslate="beToeicOnlineApp.historyContact.id">Id</span></dt>
+        <dd>
+          <span>{{ historyContact.id }}</span>
+        </dd>
+        <dt><span jhiTranslate="beToeicOnlineApp.historyContact.code">Code</span></dt>
+        <dd>
+          <span>{{ historyContact.code }}</span>
+        </dd>
+        <dt><span jhiTranslate="beToeicOnlineApp.historyContact.title">Title</span></dt>
+        <dd>
+          <span>{{ historyContact.title }}</span>
+        </dd>
+        <dt><span jhiTranslate="beToeicOnlineApp.historyContact.content">Content</span></dt>
+        <dd>
+          <span>{{ historyContact.content }}</span>
+        </dd>
+        <dt><span jhiTranslate="beToeicOnlineApp.historyContact.sender">Sender</span></dt>
+        <dd>
+          <span>{{ historyContact.sender }}</span>
+        </dd>
+        <dt><span jhiTranslate="beToeicOnlineApp.historyContact.toer">Toer</span></dt>
+        <dd>
+          <span>{{ historyContact.toer }}</span>
+        </dd>
+        <dt><span jhiTranslate="beToeicOnlineApp.historyContact.sendDate">Send Date</span></dt>
+        <dd>
+          <span>{{ historyContact.sendDate | formatMediumDatetime }}</span>
+        </dd>
+      </dl>
+
+      <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+        <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+      </button>
+
+      <button type="button" [routerLink]="['/history-contact', historyContact.id, 'edit']" class="btn btn-primary">
+        <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+      </button>
+    </div>
+  </div>
+</div>

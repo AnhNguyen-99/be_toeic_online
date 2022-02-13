@@ -1,0 +1,25 @@
+{
+  "beToeicOnlineApp": {
+    "classroomStudent": {
+      "home": {
+        "title": "Classroom Students",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Thêm mới một Classroom Student",
+        "createOrEditLabel": "Thêm mới hoặc cập nhật Classroom Student",
+        "notFound": "No Classroom Students found"
+      },
+      "created": "Một Classroom Student mới được tạo với định danh {{ param }}",
+      "updated": "Một Classroom Student cập nhật với định danh {{ param }}",
+      "deleted": "Một Classroom Student đã xóa với định danh {{ param }}",
+      "delete": {
+        "question": "Bạn có chắc là muốn xóa Classroom Student {{ id }}?"
+      },
+      "detail": {
+        "title": "Classroom Student"
+      },
+      "id": "Id",
+      "classCode": "Class Code",
+      "studentCode": "Student Code"
+    }
+  }
+}

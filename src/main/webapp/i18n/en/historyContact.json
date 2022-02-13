@@ -1,0 +1,29 @@
+{
+  "beToeicOnlineApp": {
+    "historyContact": {
+      "home": {
+        "title": "History Contacts",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new History Contact",
+        "createOrEditLabel": "Create or edit a History Contact",
+        "notFound": "No History Contacts found"
+      },
+      "created": "A new History Contact is created with identifier {{ param }}",
+      "updated": "A History Contact is updated with identifier {{ param }}",
+      "deleted": "A History Contact is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete History Contact {{ id }}?"
+      },
+      "detail": {
+        "title": "History Contact"
+      },
+      "id": "Id",
+      "code": "Code",
+      "title": "Title",
+      "content": "Content",
+      "sender": "Sender",
+      "toer": "Toer",
+      "sendDate": "Send Date"
+    }
+  }
+}

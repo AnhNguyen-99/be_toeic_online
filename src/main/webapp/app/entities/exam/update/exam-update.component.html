@@ -1,0 +1,164 @@
+<div class="row justify-content-center">
+  <div class="col-8">
+    <form name="editForm" role="form" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2 id="jhi-exam-heading" data-cy="ExamCreateUpdateHeading" jhiTranslate="beToeicOnlineApp.exam.home.createOrEditLabel">
+        Create or edit a Exam
+      </h2>
+
+      <div>
+        <jhi-alert-error></jhi-alert-error>
+
+        <div class="form-group" [hidden]="editForm.get('id')!.value == null">
+          <label class="form-control-label" jhiTranslate="beToeicOnlineApp.exam.id" for="field_id">Id</label>
+          <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-control-label" jhiTranslate="beToeicOnlineApp.exam.beginExam" for="field_beginExam">Begin Exam</label>
+          <div class="d-flex">
+            <input
+              id="field_beginExam"
+              data-cy="beginExam"
+              type="datetime-local"
+              class="form-control"
+              name="beginExam"
+              formControlName="beginExam"
+              placeholder="YYYY-MM-DD HH:mm"
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-control-label" jhiTranslate="beToeicOnlineApp.exam.durationExam" for="field_durationExam">Duration Exam</label>
+          <input
+            type="number"
+            class="form-control"
+            name="durationExam"
+            id="field_durationExam"
+            data-cy="durationExam"
+            formControlName="durationExam"
+          />
+        </div>
+
+        <div class="form-group">
+          <label class="form-control-label" jhiTranslate="beToeicOnlineApp.exam.finishExam" for="field_finishExam">Finish Exam</label>
+          <div class="d-flex">
+            <input
+              id="field_finishExam"
+              data-cy="finishExam"
+              type="datetime-local"
+              class="form-control"
+              name="finishExam"
+              formControlName="finishExam"
+              placeholder="YYYY-MM-DD HH:mm"
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-control-label" jhiTranslate="beToeicOnlineApp.exam.questionData" for="field_questionData">Question Data</label>
+          <input
+            type="text"
+            class="form-control"
+            name="questionData"
+            id="field_questionData"
+            data-cy="questionData"
+            formControlName="questionData"
+          />
+        </div>
+
+        <div class="form-group">
+          <label class="form-control-label" jhiTranslate="beToeicOnlineApp.exam.subjectCode" for="field_subjectCode">Subject Code</label>
+          <input
+            type="text"
+            class="form-control"
+            name="subjectCode"
+            id="field_subjectCode"
+            data-cy="subjectCode"
+            formControlName="subjectCode"
+          />
+        </div>
+
+        <div class="form-group">
+          <label class="form-control-label" jhiTranslate="beToeicOnlineApp.exam.title" for="field_title">Title</label>
+          <input type="text" class="form-control" name="title" id="field_title" data-cy="title" formControlName="title" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-control-label" jhiTranslate="beToeicOnlineApp.exam.status" for="field_status">Status</label>
+          <input type="checkbox" class="form-check" name="status" id="field_status" data-cy="status" formControlName="status" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-control-label" jhiTranslate="beToeicOnlineApp.exam.createDate" for="field_createDate">Create Date</label>
+          <div class="d-flex">
+            <input
+              id="field_createDate"
+              data-cy="createDate"
+              type="datetime-local"
+              class="form-control"
+              name="createDate"
+              formControlName="createDate"
+              placeholder="YYYY-MM-DD HH:mm"
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-control-label" jhiTranslate="beToeicOnlineApp.exam.createName" for="field_createName">Create Name</label>
+          <input
+            type="text"
+            class="form-control"
+            name="createName"
+            id="field_createName"
+            data-cy="createName"
+            formControlName="createName"
+          />
+        </div>
+
+        <div class="form-group">
+          <label class="form-control-label" jhiTranslate="beToeicOnlineApp.exam.updateDate" for="field_updateDate">Update Date</label>
+          <div class="d-flex">
+            <input
+              id="field_updateDate"
+              data-cy="updateDate"
+              type="datetime-local"
+              class="form-control"
+              name="updateDate"
+              formControlName="updateDate"
+              placeholder="YYYY-MM-DD HH:mm"
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-control-label" jhiTranslate="beToeicOnlineApp.exam.updateName" for="field_updateName">Update Name</label>
+          <input
+            type="text"
+            class="form-control"
+            name="updateName"
+            id="field_updateName"
+            data-cy="updateName"
+            formControlName="updateName"
+          />
+        </div>
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Save</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

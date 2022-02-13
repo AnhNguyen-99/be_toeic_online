@@ -1,0 +1,29 @@
+{
+  "beToeicOnlineApp": {
+    "historyContact": {
+      "home": {
+        "title": "History Contacts",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Thêm mới một History Contact",
+        "createOrEditLabel": "Thêm mới hoặc cập nhật History Contact",
+        "notFound": "No History Contacts found"
+      },
+      "created": "Một History Contact mới được tạo với định danh {{ param }}",
+      "updated": "Một History Contact cập nhật với định danh {{ param }}",
+      "deleted": "Một History Contact đã xóa với định danh {{ param }}",
+      "delete": {
+        "question": "Bạn có chắc là muốn xóa History Contact {{ id }}?"
+      },
+      "detail": {
+        "title": "History Contact"
+      },
+      "id": "Id",
+      "code": "Code",
+      "title": "Title",
+      "content": "Content",
+      "sender": "Sender",
+      "toer": "Toer",
+      "sendDate": "Send Date"
+    }
+  }
+}

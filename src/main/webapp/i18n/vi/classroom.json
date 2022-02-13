@@ -1,0 +1,32 @@
+{
+  "beToeicOnlineApp": {
+    "classroom": {
+      "home": {
+        "title": "Classrooms",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Thêm mới một Classroom",
+        "createOrEditLabel": "Thêm mới hoặc cập nhật Classroom",
+        "notFound": "No Classrooms found"
+      },
+      "created": "Một Classroom mới được tạo với định danh {{ param }}",
+      "updated": "Một Classroom cập nhật với định danh {{ param }}",
+      "deleted": "Một Classroom đã xóa với định danh {{ param }}",
+      "delete": {
+        "question": "Bạn có chắc là muốn xóa Classroom {{ id }}?"
+      },
+      "detail": {
+        "title": "Classroom"
+      },
+      "id": "Id",
+      "code": "Code",
+      "name": "Name",
+      "teacherCode": "Teacher Code",
+      "status": "Status",
+      "avatar": "Avatar",
+      "createDate": "Create Date",
+      "createName": "Create Name",
+      "updateDate": "Update Date",
+      "updateName": "Update Name"
+    }
+  }
+}

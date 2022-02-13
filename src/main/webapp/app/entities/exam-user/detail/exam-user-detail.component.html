@@ -1,0 +1,56 @@
+<div class="row justify-content-center">
+  <div class="col-8">
+    <div *ngIf="examUser">
+      <h2 data-cy="examUserDetailsHeading"><span jhiTranslate="beToeicOnlineApp.examUser.detail.title">Exam User</span></h2>
+
+      <hr />
+
+      <jhi-alert-error></jhi-alert-error>
+
+      <jhi-alert></jhi-alert>
+
+      <dl class="row-md jh-entity-details">
+        <dt><span jhiTranslate="beToeicOnlineApp.examUser.id">Id</span></dt>
+        <dd>
+          <span>{{ examUser.id }}</span>
+        </dd>
+        <dt><span jhiTranslate="beToeicOnlineApp.examUser.studentCode">Student Code</span></dt>
+        <dd>
+          <span>{{ examUser.studentCode }}</span>
+        </dd>
+        <dt><span jhiTranslate="beToeicOnlineApp.examUser.examId">Exam Id</span></dt>
+        <dd>
+          <span>{{ examUser.examId }}</span>
+        </dd>
+        <dt><span jhiTranslate="beToeicOnlineApp.examUser.totalPoint">Total Point</span></dt>
+        <dd>
+          <span>{{ examUser.totalPoint }}</span>
+        </dd>
+        <dt><span jhiTranslate="beToeicOnlineApp.examUser.answerSheet">Answer Sheet</span></dt>
+        <dd>
+          <span>{{ examUser.answerSheet }}</span>
+        </dd>
+        <dt><span jhiTranslate="beToeicOnlineApp.examUser.timeStart">Time Start</span></dt>
+        <dd>
+          <span>{{ examUser.timeStart | formatMediumDatetime }}</span>
+        </dd>
+        <dt><span jhiTranslate="beToeicOnlineApp.examUser.timeFinish">Time Finish</span></dt>
+        <dd>
+          <span>{{ examUser.timeFinish | formatMediumDatetime }}</span>
+        </dd>
+        <dt><span jhiTranslate="beToeicOnlineApp.examUser.timeRemaining">Time Remaining</span></dt>
+        <dd>
+          <span>{{ examUser.timeRemaining }}</span>
+        </dd>
+      </dl>
+
+      <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+        <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+      </button>
+
+      <button type="button" [routerLink]="['/exam-user', examUser.id, 'edit']" class="btn btn-primary">
+        <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+      </button>
+    </div>
+  </div>
+</div>

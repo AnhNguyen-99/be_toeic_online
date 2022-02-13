@@ -1,0 +1,92 @@
+<div>
+  <h2 id="page-heading" data-cy="SubjectHeading">
+    <span jhiTranslate="beToeicOnlineApp.subject.home.title">Subjects</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info mr-2" (click)="loadAll()" [disabled]="isLoading">
+        <fa-icon icon="sync" [spin]="isLoading"></fa-icon>
+        <span jhiTranslate="beToeicOnlineApp.subject.home.refreshListLabel">Refresh List</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-subject"
+        [routerLink]="['/subject/new']"
+      >
+        <fa-icon icon="plus"></fa-icon>
+        <span jhiTranslate="beToeicOnlineApp.subject.home.createLabel"> Create a new Subject </span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error></jhi-alert-error>
+
+  <jhi-alert></jhi-alert>
+
+  <div class="alert alert-warning" id="no-result" *ngIf="subjects?.length === 0">
+    <span jhiTranslate="beToeicOnlineApp.subject.home.notFound">No subjects found</span>
+  </div>
+
+  <div class="table-responsive" id="entities" *ngIf="subjects && subjects.length > 0">
+    <table class="table table-striped" aria-describedby="page-heading">
+      <thead>
+        <tr>
+          <th scope="col"><span jhiTranslate="beToeicOnlineApp.subject.id">Id</span></th>
+          <th scope="col"><span jhiTranslate="beToeicOnlineApp.subject.code">Code</span></th>
+          <th scope="col"><span jhiTranslate="beToeicOnlineApp.subject.name">Name</span></th>
+          <th scope="col"><span jhiTranslate="beToeicOnlineApp.subject.classCode">Class Code</span></th>
+          <th scope="col"><span jhiTranslate="beToeicOnlineApp.subject.status">Status</span></th>
+          <th scope="col"><span jhiTranslate="beToeicOnlineApp.subject.createDate">Create Date</span></th>
+          <th scope="col"><span jhiTranslate="beToeicOnlineApp.subject.createName">Create Name</span></th>
+          <th scope="col"><span jhiTranslate="beToeicOnlineApp.subject.updateDate">Update Date</span></th>
+          <th scope="col"><span jhiTranslate="beToeicOnlineApp.subject.updateName">Update Name</span></th>
+          <th scope="col"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let subject of subjects; trackBy: trackId" data-cy="entityTable">
+          <td>
+            <a [routerLink]="['/subject', subject.id, 'view']">{{ subject.id }}</a>
+          </td>
+          <td>{{ subject.code }}</td>
+          <td>{{ subject.name }}</td>
+          <td>{{ subject.classCode }}</td>
+          <td>{{ subject.status }}</td>
+          <td>{{ subject.createDate | formatMediumDatetime }}</td>
+          <td>{{ subject.createName }}</td>
+          <td>{{ subject.updateDate | formatMediumDatetime }}</td>
+          <td>{{ subject.updateName }}</td>
+          <td class="text-right">
+            <div class="btn-group">
+              <button
+                type="submit"
+                [routerLink]="['/subject', subject.id, 'view']"
+                class="btn btn-info btn-sm"
+                data-cy="entityDetailsButton"
+              >
+                <fa-icon icon="eye"></fa-icon>
+                <span class="d-none d-md-inline" jhiTranslate="entity.action.view">View</span>
+              </button>
+
+              <button
+                type="submit"
+                [routerLink]="['/subject', subject.id, 'edit']"
+                class="btn btn-primary btn-sm"
+                data-cy="entityEditButton"
+              >
+                <fa-icon icon="pencil-alt"></fa-icon>
+                <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Edit</span>
+              </button>
+
+              <button type="submit" (click)="delete(subject)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                <fa-icon icon="times"></fa-icon>
+                <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Delete</span>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,88 @@
+<div>
+  <h2 id="page-heading" data-cy="ExamHeading">
+    <span jhiTranslate="beToeicOnlineApp.exam.home.title">Exams</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info mr-2" (click)="loadAll()" [disabled]="isLoading">
+        <fa-icon icon="sync" [spin]="isLoading"></fa-icon>
+        <span jhiTranslate="beToeicOnlineApp.exam.home.refreshListLabel">Refresh List</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-exam"
+        [routerLink]="['/exam/new']"
+      >
+        <fa-icon icon="plus"></fa-icon>
+        <span jhiTranslate="beToeicOnlineApp.exam.home.createLabel"> Create a new Exam </span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error></jhi-alert-error>
+
+  <jhi-alert></jhi-alert>
+
+  <div class="alert alert-warning" id="no-result" *ngIf="exams?.length === 0">
+    <span jhiTranslate="beToeicOnlineApp.exam.home.notFound">No exams found</span>
+  </div>
+
+  <div class="table-responsive" id="entities" *ngIf="exams && exams.length > 0">
+    <table class="table table-striped" aria-describedby="page-heading">
+      <thead>
+        <tr>
+          <th scope="col"><span jhiTranslate="beToeicOnlineApp.exam.id">Id</span></th>
+          <th scope="col"><span jhiTranslate="beToeicOnlineApp.exam.beginExam">Begin Exam</span></th>
+          <th scope="col"><span jhiTranslate="beToeicOnlineApp.exam.durationExam">Duration Exam</span></th>
+          <th scope="col"><span jhiTranslate="beToeicOnlineApp.exam.finishExam">Finish Exam</span></th>
+          <th scope="col"><span jhiTranslate="beToeicOnlineApp.exam.questionData">Question Data</span></th>
+          <th scope="col"><span jhiTranslate="beToeicOnlineApp.exam.subjectCode">Subject Code</span></th>
+          <th scope="col"><span jhiTranslate="beToeicOnlineApp.exam.title">Title</span></th>
+          <th scope="col"><span jhiTranslate="beToeicOnlineApp.exam.status">Status</span></th>
+          <th scope="col"><span jhiTranslate="beToeicOnlineApp.exam.createDate">Create Date</span></th>
+          <th scope="col"><span jhiTranslate="beToeicOnlineApp.exam.createName">Create Name</span></th>
+          <th scope="col"><span jhiTranslate="beToeicOnlineApp.exam.updateDate">Update Date</span></th>
+          <th scope="col"><span jhiTranslate="beToeicOnlineApp.exam.updateName">Update Name</span></th>
+          <th scope="col"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let exam of exams; trackBy: trackId" data-cy="entityTable">
+          <td>
+            <a [routerLink]="['/exam', exam.id, 'view']">{{ exam.id }}</a>
+          </td>
+          <td>{{ exam.beginExam | formatMediumDatetime }}</td>
+          <td>{{ exam.durationExam }}</td>
+          <td>{{ exam.finishExam | formatMediumDatetime }}</td>
+          <td>{{ exam.questionData }}</td>
+          <td>{{ exam.subjectCode }}</td>
+          <td>{{ exam.title }}</td>
+          <td>{{ exam.status }}</td>
+          <td>{{ exam.createDate | formatMediumDatetime }}</td>
+          <td>{{ exam.createName }}</td>
+          <td>{{ exam.updateDate | formatMediumDatetime }}</td>
+          <td>{{ exam.updateName }}</td>
+          <td class="text-right">
+            <div class="btn-group">
+              <button type="submit" [routerLink]="['/exam', exam.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
+                <fa-icon icon="eye"></fa-icon>
+                <span class="d-none d-md-inline" jhiTranslate="entity.action.view">View</span>
+              </button>
+
+              <button type="submit" [routerLink]="['/exam', exam.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
+                <fa-icon icon="pencil-alt"></fa-icon>
+                <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Edit</span>
+              </button>
+
+              <button type="submit" (click)="delete(exam)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                <fa-icon icon="times"></fa-icon>
+                <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Delete</span>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

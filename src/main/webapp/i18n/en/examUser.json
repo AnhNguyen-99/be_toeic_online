@@ -1,0 +1,30 @@
+{
+  "beToeicOnlineApp": {
+    "examUser": {
+      "home": {
+        "title": "Exam Users",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Exam User",
+        "createOrEditLabel": "Create or edit a Exam User",
+        "notFound": "No Exam Users found"
+      },
+      "created": "A new Exam User is created with identifier {{ param }}",
+      "updated": "A Exam User is updated with identifier {{ param }}",
+      "deleted": "A Exam User is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Exam User {{ id }}?"
+      },
+      "detail": {
+        "title": "Exam User"
+      },
+      "id": "Id",
+      "studentCode": "Student Code",
+      "examId": "Exam Id",
+      "totalPoint": "Total Point",
+      "answerSheet": "Answer Sheet",
+      "timeStart": "Time Start",
+      "timeFinish": "Time Finish",
+      "timeRemaining": "Time Remaining"
+    }
+  }
+}

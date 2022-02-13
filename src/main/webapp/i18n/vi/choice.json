@@ -1,0 +1,26 @@
+{
+  "beToeicOnlineApp": {
+    "choice": {
+      "home": {
+        "title": "Choices",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Thêm mới một Choice",
+        "createOrEditLabel": "Thêm mới hoặc cập nhật Choice",
+        "notFound": "No Choices found"
+      },
+      "created": "Một Choice mới được tạo với định danh {{ param }}",
+      "updated": "Một Choice cập nhật với định danh {{ param }}",
+      "deleted": "Một Choice đã xóa với định danh {{ param }}",
+      "delete": {
+        "question": "Bạn có chắc là muốn xóa Choice {{ id }}?"
+      },
+      "detail": {
+        "title": "Choice"
+      },
+      "id": "Id",
+      "questionId": "Question Id",
+      "choiceText": "Choice Text",
+      "corrected": "Corrected"
+    }
+  }
+}

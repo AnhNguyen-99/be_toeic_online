@@ -1,0 +1,72 @@
+<div class="row justify-content-center">
+  <div class="col-8">
+    <div *ngIf="exam">
+      <h2 data-cy="examDetailsHeading"><span jhiTranslate="beToeicOnlineApp.exam.detail.title">Exam</span></h2>
+
+      <hr />
+
+      <jhi-alert-error></jhi-alert-error>
+
+      <jhi-alert></jhi-alert>
+
+      <dl class="row-md jh-entity-details">
+        <dt><span jhiTranslate="beToeicOnlineApp.exam.id">Id</span></dt>
+        <dd>
+          <span>{{ exam.id }}</span>
+        </dd>
+        <dt><span jhiTranslate="beToeicOnlineApp.exam.beginExam">Begin Exam</span></dt>
+        <dd>
+          <span>{{ exam.beginExam | formatMediumDatetime }}</span>
+        </dd>
+        <dt><span jhiTranslate="beToeicOnlineApp.exam.durationExam">Duration Exam</span></dt>
+        <dd>
+          <span>{{ exam.durationExam }}</span>
+        </dd>
+        <dt><span jhiTranslate="beToeicOnlineApp.exam.finishExam">Finish Exam</span></dt>
+        <dd>
+          <span>{{ exam.finishExam | formatMediumDatetime }}</span>
+        </dd>
+        <dt><span jhiTranslate="beToeicOnlineApp.exam.questionData">Question Data</span></dt>
+        <dd>
+          <span>{{ exam.questionData }}</span>
+        </dd>
+        <dt><span jhiTranslate="beToeicOnlineApp.exam.subjectCode">Subject Code</span></dt>
+        <dd>
+          <span>{{ exam.subjectCode }}</span>
+        </dd>
+        <dt><span jhiTranslate="beToeicOnlineApp.exam.title">Title</span></dt>
+        <dd>
+          <span>{{ exam.title }}</span>
+        </dd>
+        <dt><span jhiTranslate="beToeicOnlineApp.exam.status">Status</span></dt>
+        <dd>
+          <span>{{ exam.status }}</span>
+        </dd>
+        <dt><span jhiTranslate="beToeicOnlineApp.exam.createDate">Create Date</span></dt>
+        <dd>
+          <span>{{ exam.createDate | formatMediumDatetime }}</span>
+        </dd>
+        <dt><span jhiTranslate="beToeicOnlineApp.exam.createName">Create Name</span></dt>
+        <dd>
+          <span>{{ exam.createName }}</span>
+        </dd>
+        <dt><span jhiTranslate="beToeicOnlineApp.exam.updateDate">Update Date</span></dt>
+        <dd>
+          <span>{{ exam.updateDate | formatMediumDatetime }}</span>
+        </dd>
+        <dt><span jhiTranslate="beToeicOnlineApp.exam.updateName">Update Name</span></dt>
+        <dd>
+          <span>{{ exam.updateName }}</span>
+        </dd>
+      </dl>
+
+      <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+        <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+      </button>
+
+      <button type="button" [routerLink]="['/exam', exam.id, 'edit']" class="btn btn-primary">
+        <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,96 @@
+<div>
+  <h2 id="page-heading" data-cy="StudentHeading">
+    <span jhiTranslate="beToeicOnlineApp.student.home.title">Students</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info mr-2" (click)="loadAll()" [disabled]="isLoading">
+        <fa-icon icon="sync" [spin]="isLoading"></fa-icon>
+        <span jhiTranslate="beToeicOnlineApp.student.home.refreshListLabel">Refresh List</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-student"
+        [routerLink]="['/student/new']"
+      >
+        <fa-icon icon="plus"></fa-icon>
+        <span jhiTranslate="beToeicOnlineApp.student.home.createLabel"> Create a new Student </span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error></jhi-alert-error>
+
+  <jhi-alert></jhi-alert>
+
+  <div class="alert alert-warning" id="no-result" *ngIf="students?.length === 0">
+    <span jhiTranslate="beToeicOnlineApp.student.home.notFound">No students found</span>
+  </div>
+
+  <div class="table-responsive" id="entities" *ngIf="students && students.length > 0">
+    <table class="table table-striped" aria-describedby="page-heading">
+      <thead>
+        <tr>
+          <th scope="col"><span jhiTranslate="beToeicOnlineApp.student.id">Id</span></th>
+          <th scope="col"><span jhiTranslate="beToeicOnlineApp.student.code">Code</span></th>
+          <th scope="col"><span jhiTranslate="beToeicOnlineApp.student.fullName">Full Name</span></th>
+          <th scope="col"><span jhiTranslate="beToeicOnlineApp.student.email">Email</span></th>
+          <th scope="col"><span jhiTranslate="beToeicOnlineApp.student.phone">Phone</span></th>
+          <th scope="col"><span jhiTranslate="beToeicOnlineApp.student.status">Status</span></th>
+          <th scope="col"><span jhiTranslate="beToeicOnlineApp.student.avatar">Avatar</span></th>
+          <th scope="col"><span jhiTranslate="beToeicOnlineApp.student.createDate">Create Date</span></th>
+          <th scope="col"><span jhiTranslate="beToeicOnlineApp.student.createName">Create Name</span></th>
+          <th scope="col"><span jhiTranslate="beToeicOnlineApp.student.updateDate">Update Date</span></th>
+          <th scope="col"><span jhiTranslate="beToeicOnlineApp.student.updateName">Update Name</span></th>
+          <th scope="col"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let student of students; trackBy: trackId" data-cy="entityTable">
+          <td>
+            <a [routerLink]="['/student', student.id, 'view']">{{ student.id }}</a>
+          </td>
+          <td>{{ student.code }}</td>
+          <td>{{ student.fullName }}</td>
+          <td>{{ student.email }}</td>
+          <td>{{ student.phone }}</td>
+          <td>{{ student.status }}</td>
+          <td>{{ student.avatar }}</td>
+          <td>{{ student.createDate | formatMediumDatetime }}</td>
+          <td>{{ student.createName }}</td>
+          <td>{{ student.updateDate | formatMediumDatetime }}</td>
+          <td>{{ student.updateName }}</td>
+          <td class="text-right">
+            <div class="btn-group">
+              <button
+                type="submit"
+                [routerLink]="['/student', student.id, 'view']"
+                class="btn btn-info btn-sm"
+                data-cy="entityDetailsButton"
+              >
+                <fa-icon icon="eye"></fa-icon>
+                <span class="d-none d-md-inline" jhiTranslate="entity.action.view">View</span>
+              </button>
+
+              <button
+                type="submit"
+                [routerLink]="['/student', student.id, 'edit']"
+                class="btn btn-primary btn-sm"
+                data-cy="entityEditButton"
+              >
+                <fa-icon icon="pencil-alt"></fa-icon>
+                <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Edit</span>
+              </button>
+
+              <button type="submit" (click)="delete(student)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                <fa-icon icon="times"></fa-icon>
+                <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Delete</span>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,94 @@
+<div>
+  <h2 id="page-heading" data-cy="ClassroomHeading">
+    <span jhiTranslate="beToeicOnlineApp.classroom.home.title">Classrooms</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info mr-2" (click)="loadAll()" [disabled]="isLoading">
+        <fa-icon icon="sync" [spin]="isLoading"></fa-icon>
+        <span jhiTranslate="beToeicOnlineApp.classroom.home.refreshListLabel">Refresh List</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-classroom"
+        [routerLink]="['/classroom/new']"
+      >
+        <fa-icon icon="plus"></fa-icon>
+        <span jhiTranslate="beToeicOnlineApp.classroom.home.createLabel"> Create a new Classroom </span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error></jhi-alert-error>
+
+  <jhi-alert></jhi-alert>
+
+  <div class="alert alert-warning" id="no-result" *ngIf="classrooms?.length === 0">
+    <span jhiTranslate="beToeicOnlineApp.classroom.home.notFound">No classrooms found</span>
+  </div>
+
+  <div class="table-responsive" id="entities" *ngIf="classrooms && classrooms.length > 0">
+    <table class="table table-striped" aria-describedby="page-heading">
+      <thead>
+        <tr>
+          <th scope="col"><span jhiTranslate="beToeicOnlineApp.classroom.id">Id</span></th>
+          <th scope="col"><span jhiTranslate="beToeicOnlineApp.classroom.code">Code</span></th>
+          <th scope="col"><span jhiTranslate="beToeicOnlineApp.classroom.name">Name</span></th>
+          <th scope="col"><span jhiTranslate="beToeicOnlineApp.classroom.teacherCode">Teacher Code</span></th>
+          <th scope="col"><span jhiTranslate="beToeicOnlineApp.classroom.status">Status</span></th>
+          <th scope="col"><span jhiTranslate="beToeicOnlineApp.classroom.avatar">Avatar</span></th>
+          <th scope="col"><span jhiTranslate="beToeicOnlineApp.classroom.createDate">Create Date</span></th>
+          <th scope="col"><span jhiTranslate="beToeicOnlineApp.classroom.createName">Create Name</span></th>
+          <th scope="col"><span jhiTranslate="beToeicOnlineApp.classroom.updateDate">Update Date</span></th>
+          <th scope="col"><span jhiTranslate="beToeicOnlineApp.classroom.updateName">Update Name</span></th>
+          <th scope="col"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let classroom of classrooms; trackBy: trackId" data-cy="entityTable">
+          <td>
+            <a [routerLink]="['/classroom', classroom.id, 'view']">{{ classroom.id }}</a>
+          </td>
+          <td>{{ classroom.code }}</td>
+          <td>{{ classroom.name }}</td>
+          <td>{{ classroom.teacherCode }}</td>
+          <td>{{ classroom.status }}</td>
+          <td>{{ classroom.avatar }}</td>
+          <td>{{ classroom.createDate | formatMediumDatetime }}</td>
+          <td>{{ classroom.createName }}</td>
+          <td>{{ classroom.updateDate | formatMediumDatetime }}</td>
+          <td>{{ classroom.updateName }}</td>
+          <td class="text-right">
+            <div class="btn-group">
+              <button
+                type="submit"
+                [routerLink]="['/classroom', classroom.id, 'view']"
+                class="btn btn-info btn-sm"
+                data-cy="entityDetailsButton"
+              >
+                <fa-icon icon="eye"></fa-icon>
+                <span class="d-none d-md-inline" jhiTranslate="entity.action.view">View</span>
+              </button>
+
+              <button
+                type="submit"
+                [routerLink]="['/classroom', classroom.id, 'edit']"
+                class="btn btn-primary btn-sm"
+                data-cy="entityEditButton"
+              >
+                <fa-icon icon="pencil-alt"></fa-icon>
+                <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Edit</span>
+              </button>
+
+              <button type="submit" (click)="delete(classroom)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                <fa-icon icon="times"></fa-icon>
+                <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Delete</span>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,6 @@
+entity HistoryContactDetails {
+	id Long,
+    historyContact String,
+    isOpen Boolean,
+    status Boolean
+}

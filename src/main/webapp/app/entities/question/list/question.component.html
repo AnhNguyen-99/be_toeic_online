@@ -1,0 +1,96 @@
+<div>
+  <h2 id="page-heading" data-cy="QuestionHeading">
+    <span jhiTranslate="beToeicOnlineApp.question.home.title">Questions</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info mr-2" (click)="loadAll()" [disabled]="isLoading">
+        <fa-icon icon="sync" [spin]="isLoading"></fa-icon>
+        <span jhiTranslate="beToeicOnlineApp.question.home.refreshListLabel">Refresh List</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-question"
+        [routerLink]="['/question/new']"
+      >
+        <fa-icon icon="plus"></fa-icon>
+        <span jhiTranslate="beToeicOnlineApp.question.home.createLabel"> Create a new Question </span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error></jhi-alert-error>
+
+  <jhi-alert></jhi-alert>
+
+  <div class="alert alert-warning" id="no-result" *ngIf="questions?.length === 0">
+    <span jhiTranslate="beToeicOnlineApp.question.home.notFound">No questions found</span>
+  </div>
+
+  <div class="table-responsive" id="entities" *ngIf="questions && questions.length > 0">
+    <table class="table table-striped" aria-describedby="page-heading">
+      <thead>
+        <tr>
+          <th scope="col"><span jhiTranslate="beToeicOnlineApp.question.id">Id</span></th>
+          <th scope="col"><span jhiTranslate="beToeicOnlineApp.question.questionType">Question Type</span></th>
+          <th scope="col"><span jhiTranslate="beToeicOnlineApp.question.questionText">Question Text</span></th>
+          <th scope="col"><span jhiTranslate="beToeicOnlineApp.question.subjectCode">Subject Code</span></th>
+          <th scope="col"><span jhiTranslate="beToeicOnlineApp.question.level">Level</span></th>
+          <th scope="col"><span jhiTranslate="beToeicOnlineApp.question.point">Point</span></th>
+          <th scope="col"><span jhiTranslate="beToeicOnlineApp.question.status">Status</span></th>
+          <th scope="col"><span jhiTranslate="beToeicOnlineApp.question.createDate">Create Date</span></th>
+          <th scope="col"><span jhiTranslate="beToeicOnlineApp.question.createName">Create Name</span></th>
+          <th scope="col"><span jhiTranslate="beToeicOnlineApp.question.updateDate">Update Date</span></th>
+          <th scope="col"><span jhiTranslate="beToeicOnlineApp.question.updateName">Update Name</span></th>
+          <th scope="col"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let question of questions; trackBy: trackId" data-cy="entityTable">
+          <td>
+            <a [routerLink]="['/question', question.id, 'view']">{{ question.id }}</a>
+          </td>
+          <td>{{ question.questionType }}</td>
+          <td>{{ question.questionText }}</td>
+          <td>{{ question.subjectCode }}</td>
+          <td>{{ question.level }}</td>
+          <td>{{ question.point }}</td>
+          <td>{{ question.status }}</td>
+          <td>{{ question.createDate | formatMediumDatetime }}</td>
+          <td>{{ question.createName }}</td>
+          <td>{{ question.updateDate | formatMediumDatetime }}</td>
+          <td>{{ question.updateName }}</td>
+          <td class="text-right">
+            <div class="btn-group">
+              <button
+                type="submit"
+                [routerLink]="['/question', question.id, 'view']"
+                class="btn btn-info btn-sm"
+                data-cy="entityDetailsButton"
+              >
+                <fa-icon icon="eye"></fa-icon>
+                <span class="d-none d-md-inline" jhiTranslate="entity.action.view">View</span>
+              </button>
+
+              <button
+                type="submit"
+                [routerLink]="['/question', question.id, 'edit']"
+                class="btn btn-primary btn-sm"
+                data-cy="entityEditButton"
+              >
+                <fa-icon icon="pencil-alt"></fa-icon>
+                <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Edit</span>
+              </button>
+
+              <button type="submit" (click)="delete(question)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                <fa-icon icon="times"></fa-icon>
+                <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Delete</span>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

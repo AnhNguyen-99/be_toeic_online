@@ -1,0 +1,26 @@
+{
+  "beToeicOnlineApp": {
+    "historyContactDetails": {
+      "home": {
+        "title": "History Contact Details",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new History Contact Details",
+        "createOrEditLabel": "Create or edit a History Contact Details",
+        "notFound": "No History Contact Details found"
+      },
+      "created": "A new History Contact Details is created with identifier {{ param }}",
+      "updated": "A History Contact Details is updated with identifier {{ param }}",
+      "deleted": "A History Contact Details is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete History Contact Details {{ id }}?"
+      },
+      "detail": {
+        "title": "History Contact Details"
+      },
+      "id": "Id",
+      "historyContact": "History Contact",
+      "isOpen": "Is Open",
+      "status": "Status"
+    }
+  }
+}

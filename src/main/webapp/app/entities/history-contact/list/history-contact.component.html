@@ -1,0 +1,88 @@
+<div>
+  <h2 id="page-heading" data-cy="HistoryContactHeading">
+    <span jhiTranslate="beToeicOnlineApp.historyContact.home.title">History Contacts</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info mr-2" (click)="loadAll()" [disabled]="isLoading">
+        <fa-icon icon="sync" [spin]="isLoading"></fa-icon>
+        <span jhiTranslate="beToeicOnlineApp.historyContact.home.refreshListLabel">Refresh List</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-history-contact"
+        [routerLink]="['/history-contact/new']"
+      >
+        <fa-icon icon="plus"></fa-icon>
+        <span jhiTranslate="beToeicOnlineApp.historyContact.home.createLabel"> Create a new History Contact </span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error></jhi-alert-error>
+
+  <jhi-alert></jhi-alert>
+
+  <div class="alert alert-warning" id="no-result" *ngIf="historyContacts?.length === 0">
+    <span jhiTranslate="beToeicOnlineApp.historyContact.home.notFound">No historyContacts found</span>
+  </div>
+
+  <div class="table-responsive" id="entities" *ngIf="historyContacts && historyContacts.length > 0">
+    <table class="table table-striped" aria-describedby="page-heading">
+      <thead>
+        <tr>
+          <th scope="col"><span jhiTranslate="beToeicOnlineApp.historyContact.id">Id</span></th>
+          <th scope="col"><span jhiTranslate="beToeicOnlineApp.historyContact.code">Code</span></th>
+          <th scope="col"><span jhiTranslate="beToeicOnlineApp.historyContact.title">Title</span></th>
+          <th scope="col"><span jhiTranslate="beToeicOnlineApp.historyContact.content">Content</span></th>
+          <th scope="col"><span jhiTranslate="beToeicOnlineApp.historyContact.sender">Sender</span></th>
+          <th scope="col"><span jhiTranslate="beToeicOnlineApp.historyContact.toer">Toer</span></th>
+          <th scope="col"><span jhiTranslate="beToeicOnlineApp.historyContact.sendDate">Send Date</span></th>
+          <th scope="col"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let historyContact of historyContacts; trackBy: trackId" data-cy="entityTable">
+          <td>
+            <a [routerLink]="['/history-contact', historyContact.id, 'view']">{{ historyContact.id }}</a>
+          </td>
+          <td>{{ historyContact.code }}</td>
+          <td>{{ historyContact.title }}</td>
+          <td>{{ historyContact.content }}</td>
+          <td>{{ historyContact.sender }}</td>
+          <td>{{ historyContact.toer }}</td>
+          <td>{{ historyContact.sendDate | formatMediumDatetime }}</td>
+          <td class="text-right">
+            <div class="btn-group">
+              <button
+                type="submit"
+                [routerLink]="['/history-contact', historyContact.id, 'view']"
+                class="btn btn-info btn-sm"
+                data-cy="entityDetailsButton"
+              >
+                <fa-icon icon="eye"></fa-icon>
+                <span class="d-none d-md-inline" jhiTranslate="entity.action.view">View</span>
+              </button>
+
+              <button
+                type="submit"
+                [routerLink]="['/history-contact', historyContact.id, 'edit']"
+                class="btn btn-primary btn-sm"
+                data-cy="entityEditButton"
+              >
+                <fa-icon icon="pencil-alt"></fa-icon>
+                <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Edit</span>
+              </button>
+
+              <button type="submit" (click)="delete(historyContact)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                <fa-icon icon="times"></fa-icon>
+                <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Delete</span>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
