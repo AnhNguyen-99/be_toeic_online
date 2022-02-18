@@ -1,16 +1,26 @@
 package com.toeic.online.web.rest;
 
+import com.toeic.online.commons.ExportUtils;
+import com.toeic.online.domain.Authority;
 import com.toeic.online.domain.Teacher;
+import com.toeic.online.domain.User;
 import com.toeic.online.repository.TeacherRepository;
+import com.toeic.online.service.TeacherService;
+import com.toeic.online.service.UserService;
+import com.toeic.online.service.dto.*;
 import com.toeic.online.web.rest.errors.BadRequestAlertException;
+
+import java.io.ByteArrayInputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.time.Instant;
+import java.util.*;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -34,8 +44,17 @@ public class TeacherResource {
 
     private final TeacherRepository teacherRepository;
 
-    public TeacherResource(TeacherRepository teacherRepository) {
+    private final UserService userService;
+
+    private final TeacherService teacherService;
+
+    private final ExportUtils exportUtils;
+
+    public TeacherResource(TeacherRepository teacherRepository, UserService userService, TeacherService teacherService, ExportUtils exportUtils) {
         this.teacherRepository = teacherRepository;
+        this.userService = userService;
+        this.teacherService = teacherService;
+        this.exportUtils = exportUtils;
     }
 
     /**
@@ -51,7 +70,28 @@ public class TeacherResource {
         if (teacher.getId() != null) {
             throw new BadRequestAlertException("A new teacher cannot already have an ID", ENTITY_NAME, "idexists");
         }
+        Optional<User> userCreate = userService.getUserWithAuthorities();
+        teacher.setCreateName(userCreate.get().getLogin());
+        teacher.setCreateDate(Instant.now());
+        teacher.setStatus(true);
         Teacher result = teacherRepository.save(teacher);
+        // Lưu thông gv vào bảng jhi_use
+        User user = new User();
+        user.setLogin(teacher.getCode());
+        user.setFullName(teacher.getFullName());
+        user.setPhoneNumber(teacher.getPhone());
+        user.setImageUrl(teacher.getAvatar());
+        user.setActivated(true);
+        user.setEmail(teacher.getEmail());
+        user.setCreatedDate(Instant.now());
+        user.setCreatedBy(teacher.getCreateName());
+        user.setLastModifiedBy(teacher.getCreateName());
+        user.setLastModifiedDate(Instant.now());
+        Set<Authority> authorities = new HashSet<>();
+        Authority authority = new Authority("ROLE_GV");
+        authorities.add(authority);
+        user.setAuthorities(authorities);
+        user = userService.save(user);
         return ResponseEntity
             .created(new URI("/api/teachers/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
@@ -200,5 +240,38 @@ public class TeacherResource {
             .noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
+    }
+
+    @PostMapping("/teachers/search")
+    public ResponseEntity<?> search(@RequestBody SearchTeacherDTO searchTeacherDTO,
+                                    @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
+                                    @RequestParam(value = "page-size", required = false, defaultValue = "10") Integer pageSize){
+        Map<String, Object> result = teacherService.search(searchTeacherDTO, page, pageSize);
+        return ResponseEntity.ok().body(result);
+    }
+
+    @PostMapping("/teachers/export")
+    public ResponseEntity<?> export(@RequestBody SearchTeacherDTO searchTeacherDTO) throws Exception {
+        List<TeacherDTO> listData = teacherService.exportData(searchTeacherDTO);
+        List<ExcelColumn> lstColumn = buildColumnExport();
+        String title = "Danh sách giảng viên";
+        ExcelTitle excelTitle = new ExcelTitle(title, "", "");
+        ByteArrayInputStream byteArrayInputStream = exportUtils.onExport(lstColumn, listData, 3, 0, excelTitle, true);
+        InputStreamResource resource = new InputStreamResource(byteArrayInputStream);
+        return ResponseEntity.ok()
+            .contentLength(byteArrayInputStream.available())
+            .contentType(MediaType.parseMediaType("application/octet-stream"))
+            .body(resource);
+    }
+
+    private List<ExcelColumn> buildColumnExport(){
+        List<ExcelColumn> lstColumn = new ArrayList<>();
+        lstColumn.add(new ExcelColumn("code", "Mã giảng viên", ExcelColumn.ALIGN_MENT.LEFT));
+        lstColumn.add(new ExcelColumn("fullName", "Tên giảng viên",ExcelColumn.ALIGN_MENT.LEFT));
+        lstColumn.add(new ExcelColumn("email", "Email",ExcelColumn.ALIGN_MENT.LEFT));
+        lstColumn.add(new ExcelColumn("phone", "Số điện thoại",ExcelColumn.ALIGN_MENT.LEFT));
+        lstColumn.add(new ExcelColumn("createDate", "Ngày tạo",ExcelColumn.ALIGN_MENT.LEFT));
+        lstColumn.add(new ExcelColumn("createName", "Người tạo",ExcelColumn.ALIGN_MENT.LEFT));
+        return lstColumn;
     }
 }

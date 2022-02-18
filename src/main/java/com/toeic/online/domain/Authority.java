@@ -28,6 +28,7 @@ public class Authority implements Serializable {
     }
 
     public Authority(String admin) {
+        this.name = admin;
     }
 
     public String getName() {

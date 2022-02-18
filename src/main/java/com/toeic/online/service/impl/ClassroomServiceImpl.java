@@ -39,7 +39,6 @@ public class ClassroomServiceImpl implements ClassroomService {
 
     @Override
     public ByteArrayInputStream getSampleFile() throws IOException {
-        List<String> array1 = List.of(new String[]{"k1", "k2", "k3", "k4", "k5", "k6", "k7", "k8", "k9", "k10", "k11"});
         String path = folderSampleFile + "DS_Lophoc.xls";
         InputStream file = new BufferedInputStream(new FileInputStream(path));
 

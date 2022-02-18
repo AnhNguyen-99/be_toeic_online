@@ -1,16 +1,27 @@
 package com.toeic.online.web.rest;
 
+import com.toeic.online.commons.ExportUtils;
+import com.toeic.online.domain.Classroom;
 import com.toeic.online.domain.ClassroomStudent;
+import com.toeic.online.repository.ClassroomRepository;
 import com.toeic.online.repository.ClassroomStudentRepository;
+import com.toeic.online.service.ClassroomStudentService;
+import com.toeic.online.service.dto.ClassroomStudentDTO;
+import com.toeic.online.service.dto.ClassroomStudentSearchDTO;
+import com.toeic.online.service.dto.ExcelColumn;
+import com.toeic.online.service.dto.ExcelTitle;
 import com.toeic.online.web.rest.errors.BadRequestAlertException;
+
+import java.io.ByteArrayInputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -29,13 +40,22 @@ public class ClassroomStudentResource {
 
     private static final String ENTITY_NAME = "classroomStudent";
 
+    private final ClassroomStudentService classroomStudentService;
+
+    private final ClassroomRepository classroomRepository;
+
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
 
     private final ClassroomStudentRepository classroomStudentRepository;
 
-    public ClassroomStudentResource(ClassroomStudentRepository classroomStudentRepository) {
+    private final ExportUtils exportUtils;
+
+    public ClassroomStudentResource(ClassroomStudentService classroomStudentService, ClassroomRepository classroomRepository, ClassroomStudentRepository classroomStudentRepository, ExportUtils exportUtils) {
+        this.classroomStudentService = classroomStudentService;
+        this.classroomRepository = classroomRepository;
         this.classroomStudentRepository = classroomStudentRepository;
+        this.exportUtils = exportUtils;
     }
 
     /**
@@ -179,5 +199,37 @@ public class ClassroomStudentResource {
             .noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
+    }
+
+    @PostMapping("/classroom-student/search")
+    public ResponseEntity<?> search(@RequestBody ClassroomStudentSearchDTO classroomStudentSearchDTO,
+                                    @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
+                                    @RequestParam(value = "page-size", required = false, defaultValue = "10") Integer pageSize){
+        Map<String, Object> result = classroomStudentService.search(classroomStudentSearchDTO.getClassCode(), classroomStudentSearchDTO.getStudentCode(), page, pageSize);
+        return ResponseEntity.ok().body(result);
+    }
+
+    @PostMapping("/classroom-student/export")
+    public ResponseEntity<?> export(@RequestBody ClassroomStudentSearchDTO classroomStudentSearchDTO) throws Exception {
+        List<ClassroomStudentDTO> listData = classroomStudentService.exportData(classroomStudentSearchDTO.getClassCode(), classroomStudentSearchDTO.getStudentCode());
+        Classroom classroom = classroomRepository.findByCode(classroomStudentSearchDTO.getClassCode());
+        List<ExcelColumn> lstColumn = buildColumnExport();
+        String title = "Danh sách sinh viên thuộc lớp: " + classroom.getName();
+        ExcelTitle excelTitle = new ExcelTitle(title, "", "");
+        ByteArrayInputStream byteArrayInputStream = exportUtils.onExport(lstColumn, listData, 3, 0, excelTitle, true);
+        InputStreamResource resource = new InputStreamResource(byteArrayInputStream);
+        return ResponseEntity.ok()
+            .contentLength(byteArrayInputStream.available())
+            .contentType(MediaType.parseMediaType("application/octet-stream"))
+            .body(resource);
+    }
+
+    private List<ExcelColumn> buildColumnExport(){
+        List<ExcelColumn> lstColumn = new ArrayList<>();
+        lstColumn.add(new ExcelColumn("studentCode", "Mã sinh viên", ExcelColumn.ALIGN_MENT.LEFT));
+        lstColumn.add(new ExcelColumn("studentName", "Tên sinh viên",ExcelColumn.ALIGN_MENT.LEFT));
+        lstColumn.add(new ExcelColumn("email", "Email",ExcelColumn.ALIGN_MENT.LEFT));
+        lstColumn.add(new ExcelColumn("phone", "Số điện thoại",ExcelColumn.ALIGN_MENT.LEFT));
+        return lstColumn;
     }
 }

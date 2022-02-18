@@ -294,4 +294,28 @@ public class UserService {
     public List<String> getAuthorities() {
         return authorityRepository.findAll().stream().map(Authority::getName).collect(Collectors.toList());
     }
+
+//    public void clearUserCaches(User user) {
+//        Objects.requireNonNull(cacheManager.getCache(UserRepository.USERS_BY_LOGIN_CACHE)).evict(user.getLogin());
+//        if (user.getEmail() != null) {
+//            Objects.requireNonNull(cacheManager.getCache(UserRepository.USERS_BY_EMAIL_CACHE)).evict(user.getEmail());
+//        }
+//    }
+
+    @Transactional
+    public User save(User user) {
+        String passwordEncoded = this.passwordEncoder.encode("123456");
+        user.setPassword(passwordEncoded);
+        return this.userRepository.save(user);
+    }
+
+    @Transactional
+    public User update(User user) {
+        User updated = this.userRepository.save(user);
+        return updated;
+    }
+
+    public Optional<User> findByLogin(String login) {
+        return this.userRepository.findOneByLogin(login);
+    }
 }

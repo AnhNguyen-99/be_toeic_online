@@ -5,7 +5,6 @@ import com.toeic.online.service.dto.ClassroomDTO;
 import org.hibernate.Session;
 import org.hibernate.query.NativeQuery;
 import org.hibernate.transform.Transformers;
-import org.hibernate.type.BooleanType;
 import org.hibernate.type.InstantType;
 import org.hibernate.type.StringType;
 import org.springframework.stereotype.Component;
