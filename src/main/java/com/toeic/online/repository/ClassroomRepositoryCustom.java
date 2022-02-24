@@ -1,12 +1,13 @@
 package com.toeic.online.repository;
 
 import com.toeic.online.service.dto.ClassroomDTO;
-import org.springframework.stereotype.Repository;
-
+import com.toeic.online.service.dto.ClassroomSearchDTO;
 import java.util.List;
+import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ClassroomRepositoryCustom {
+    List<ClassroomDTO> exportData(ClassroomSearchDTO classroomSearchDTO);
 
-    List<ClassroomDTO> exportData();
+    List<ClassroomDTO> search(ClassroomSearchDTO classroomSearchDTO, Integer page, Integer pageSize);
 }

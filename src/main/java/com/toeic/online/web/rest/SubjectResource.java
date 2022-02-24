@@ -8,13 +8,11 @@ import com.toeic.online.service.SubjectService;
 import com.toeic.online.service.UserService;
 import com.toeic.online.service.dto.*;
 import com.toeic.online.web.rest.errors.BadRequestAlertException;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -49,7 +47,12 @@ public class SubjectResource {
 
     private final ExportUtils exportUtils;
 
-    public SubjectResource(SubjectRepository subjectRepository, UserService userService, SubjectService subjectService, ExportUtils exportUtils) {
+    public SubjectResource(
+        SubjectRepository subjectRepository,
+        UserService userService,
+        SubjectService subjectService,
+        ExportUtils exportUtils
+    ) {
         this.subjectRepository = subjectRepository;
         this.userService = userService;
         this.subjectService = subjectService;
@@ -66,17 +69,21 @@ public class SubjectResource {
     @PostMapping("/subjects")
     public ResponseEntity<Subject> createSubject(@RequestBody Subject subject) throws URISyntaxException {
         log.debug("REST request to save Subject : {}", subject);
-        if (subject.getId() != null) {
-            throw new BadRequestAlertException("A new subject cannot already have an ID", ENTITY_NAME, "idexists");
-        }
+        //        if (subject.getId() != null) {
+        //            throw new BadRequestAlertException("A new subject cannot already have an ID", ENTITY_NAME, "idexists");
+        //        }
         Optional<User> userLogin = userService.getUserWithAuthorities();
-        if(subject.getId() == null){
+        if (subject.getId() == null) {
             subject.setCreateName(userLogin.get().getLogin());
             subject.setCreateDate(new Date().toInstant());
-        }else{
+        } else {
+            Subject subjectOld = subjectRepository.findById(subject.getId()).get();
+            subject.setCreateName(subjectOld.getCreateName());
+            subject.setCreateDate(subjectOld.getCreateDate());
             subject.setUpdateName(userLogin.get().getLogin());
             subject.setUpdateDate(new Date().toInstant());
         }
+        subject.setStatus(true);
         Subject result = subjectRepository.save(subject);
         return ResponseEntity
             .created(new URI("/api/subjects/" + result.getId()))
@@ -146,34 +153,36 @@ public class SubjectResource {
 
         Optional<Subject> result = subjectRepository
             .findById(subject.getId())
-            .map(existingSubject -> {
-                if (subject.getCode() != null) {
-                    existingSubject.setCode(subject.getCode());
-                }
-                if (subject.getName() != null) {
-                    existingSubject.setName(subject.getName());
-                }
-                if (subject.getClassCode() != null) {
-                    existingSubject.setClassCode(subject.getClassCode());
-                }
-                if (subject.getStatus() != null) {
-                    existingSubject.setStatus(subject.getStatus());
-                }
-                if (subject.getCreateDate() != null) {
-                    existingSubject.setCreateDate(subject.getCreateDate());
-                }
-                if (subject.getCreateName() != null) {
-                    existingSubject.setCreateName(subject.getCreateName());
-                }
-                if (subject.getUpdateDate() != null) {
-                    existingSubject.setUpdateDate(subject.getUpdateDate());
-                }
-                if (subject.getUpdateName() != null) {
-                    existingSubject.setUpdateName(subject.getUpdateName());
-                }
+            .map(
+                existingSubject -> {
+                    if (subject.getCode() != null) {
+                        existingSubject.setCode(subject.getCode());
+                    }
+                    if (subject.getName() != null) {
+                        existingSubject.setName(subject.getName());
+                    }
+                    if (subject.getClassCode() != null) {
+                        existingSubject.setClassCode(subject.getClassCode());
+                    }
+                    if (subject.getStatus() != null) {
+                        existingSubject.setStatus(subject.getStatus());
+                    }
+                    if (subject.getCreateDate() != null) {
+                        existingSubject.setCreateDate(subject.getCreateDate());
+                    }
+                    if (subject.getCreateName() != null) {
+                        existingSubject.setCreateName(subject.getCreateName());
+                    }
+                    if (subject.getUpdateDate() != null) {
+                        existingSubject.setUpdateDate(subject.getUpdateDate());
+                    }
+                    if (subject.getUpdateName() != null) {
+                        existingSubject.setUpdateName(subject.getUpdateName());
+                    }
 
-                return existingSubject;
-            })
+                    return existingSubject;
+                }
+            )
             .map(subjectRepository::save);
 
         return ResponseUtil.wrapOrNotFound(
@@ -223,27 +232,28 @@ public class SubjectResource {
     }
 
     @PostMapping("subjects/export")
-    public ResponseEntity<?> export(@RequestBody ClassroomSearchDTO classroomSearchDTO) throws Exception{
-        List<SubjectDTO> listData = subjectService.exportData();
+    public ResponseEntity<?> export(@RequestBody SearchSubjectDTO searchSubjectDTO) throws Exception {
+        List<SubjectDTO> listData = subjectService.exportData(searchSubjectDTO);
         List<ExcelColumn> lstColumn = buildColumnExport();
         String title = "Danh sách môn học";
         ExcelTitle excelTitle = new ExcelTitle(title, "", "");
         ByteArrayInputStream byteArrayInputStream = exportUtils.onExport(lstColumn, listData, 3, 0, excelTitle, true);
         InputStreamResource resource = new InputStreamResource(byteArrayInputStream);
-        return ResponseEntity.ok()
+        return ResponseEntity
+            .ok()
             .contentLength(byteArrayInputStream.available())
             .contentType(MediaType.parseMediaType("application/octet-stream"))
             .body(resource);
     }
 
-    private List<ExcelColumn> buildColumnExport(){
+    private List<ExcelColumn> buildColumnExport() {
         List<ExcelColumn> lstColumn = new ArrayList<>();
         lstColumn.add(new ExcelColumn("code", "Mã môn học", ExcelColumn.ALIGN_MENT.LEFT));
-        lstColumn.add(new ExcelColumn("name", "Tên môn học",ExcelColumn.ALIGN_MENT.LEFT));
-        lstColumn.add(new ExcelColumn("className", "Lớp học",ExcelColumn.ALIGN_MENT.LEFT));
-        lstColumn.add(new ExcelColumn("statusStr", "Trạng thái",ExcelColumn.ALIGN_MENT.LEFT));
-        lstColumn.add(new ExcelColumn("createDate", "Ngày tạo",ExcelColumn.ALIGN_MENT.LEFT));
-        lstColumn.add(new ExcelColumn("createName", "Người tạo",ExcelColumn.ALIGN_MENT.LEFT));
+        lstColumn.add(new ExcelColumn("name", "Tên môn học", ExcelColumn.ALIGN_MENT.LEFT));
+        lstColumn.add(new ExcelColumn("className", "Lớp học", ExcelColumn.ALIGN_MENT.LEFT));
+        lstColumn.add(new ExcelColumn("statusStr", "Trạng thái", ExcelColumn.ALIGN_MENT.LEFT));
+        lstColumn.add(new ExcelColumn("createDate", "Ngày tạo", ExcelColumn.ALIGN_MENT.LEFT));
+        lstColumn.add(new ExcelColumn("createName", "Người tạo", ExcelColumn.ALIGN_MENT.LEFT));
         return lstColumn;
     }
 
@@ -262,5 +272,21 @@ public class SubjectResource {
             log.error(e.getMessage(), e);
             return null;
         }
+    }
+
+    @PostMapping("/subjects/search")
+    public ResponseEntity<?> search(
+        @RequestBody SearchSubjectDTO searchSubjectDTO,
+        @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
+        @RequestParam(value = "page-size", required = false, defaultValue = "10") Integer pageSize
+    ) {
+        Map<String, Object> result = subjectService.search(searchSubjectDTO, page, pageSize);
+        return ResponseEntity.ok().body(result);
+    }
+
+    @PostMapping("/subjects/findByCode")
+    public ResponseEntity<?> findByCode(@RequestBody String code) {
+        Subject subject = subjectRepository.findByCode(code);
+        return ResponseEntity.ok().body(subject);
     }
 }
