@@ -1,16 +1,25 @@
 package com.toeic.online.web.rest;
 
+import com.toeic.online.commons.ExportUtils;
+import com.toeic.online.domain.Authority;
 import com.toeic.online.domain.Student;
+import com.toeic.online.domain.Teacher;
+import com.toeic.online.domain.User;
 import com.toeic.online.repository.StudentRepository;
+import com.toeic.online.service.StudentService;
+import com.toeic.online.service.UserService;
+import com.toeic.online.service.dto.*;
 import com.toeic.online.web.rest.errors.BadRequestAlertException;
+import java.io.ByteArrayInputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.time.Instant;
+import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -34,8 +43,22 @@ public class StudentResource {
 
     private final StudentRepository studentRepository;
 
-    public StudentResource(StudentRepository studentRepository) {
+    private final StudentService studentService;
+
+    private final ExportUtils exportUtils;
+
+    private final UserService userService;
+
+    public StudentResource(
+        StudentRepository studentRepository,
+        StudentService studentService,
+        ExportUtils exportUtils,
+        UserService userService
+    ) {
         this.studentRepository = studentRepository;
+        this.studentService = studentService;
+        this.exportUtils = exportUtils;
+        this.userService = userService;
     }
 
     /**
@@ -48,10 +71,50 @@ public class StudentResource {
     @PostMapping("/students")
     public ResponseEntity<Student> createStudent(@RequestBody Student student) throws URISyntaxException {
         log.debug("REST request to save Student : {}", student);
-        if (student.getId() != null) {
-            throw new BadRequestAlertException("A new student cannot already have an ID", ENTITY_NAME, "idexists");
+        //        if (student.getId() != null) {
+        //            throw new BadRequestAlertException("A new student cannot already have an ID", ENTITY_NAME, "idexists");
+        //        }
+        Long idStudent = student.getId();
+        Optional<User> userCreate = userService.getUserWithAuthorities();
+        if (student.getId() == null) {
+            student.createDate(Instant.now());
+            student.createName(userCreate.get().getLogin());
+        } else {
+            Student studentOld = studentRepository.findById(student.getId()).get();
+            student.createDate(studentOld.getCreateDate());
+            student.createName(studentOld.getCreateName());
+            student.updateDate(Instant.now());
+            student.updateName(userCreate.get().getLogin());
         }
+        student.setCode(student.getCode().toLowerCase());
+        student.setStatus(true);
         Student result = studentRepository.save(student);
+        if (idStudent == null) {
+            User user = new User();
+            user.setLogin(student.getCode());
+            user.setFullName(student.getFullName());
+            user.setPhoneNumber(student.getPhone());
+            user.setImageUrl(student.getAvatar());
+            user.setActivated(true);
+            user.setEmail(student.getEmail());
+            user.setCreatedDate(Instant.now());
+            user.setCreatedBy(student.getCreateName());
+            user.setLastModifiedBy(student.getCreateName());
+            user.setLastModifiedDate(Instant.now());
+            Set<Authority> authorities = new HashSet<>();
+            Authority authority = new Authority("ROLE_SV");
+            authorities.add(authority);
+            user.setAuthorities(authorities);
+            user = userService.save(user);
+        } else {
+            User userUpdate = userService.findByLogin(student.getCode()).get();
+            userUpdate.setLogin(student.getCode());
+            userUpdate.setFullName(student.getFullName());
+            userUpdate.setPhoneNumber(student.getPhone());
+            userUpdate.setImageUrl(student.getAvatar());
+            userUpdate.setEmail(student.getEmail());
+            userUpdate = userService.update(userUpdate);
+        }
         return ResponseEntity
             .created(new URI("/api/students/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
@@ -120,40 +183,42 @@ public class StudentResource {
 
         Optional<Student> result = studentRepository
             .findById(student.getId())
-            .map(existingStudent -> {
-                if (student.getCode() != null) {
-                    existingStudent.setCode(student.getCode());
-                }
-                if (student.getFullName() != null) {
-                    existingStudent.setFullName(student.getFullName());
-                }
-                if (student.getEmail() != null) {
-                    existingStudent.setEmail(student.getEmail());
-                }
-                if (student.getPhone() != null) {
-                    existingStudent.setPhone(student.getPhone());
-                }
-                if (student.getStatus() != null) {
-                    existingStudent.setStatus(student.getStatus());
-                }
-                if (student.getAvatar() != null) {
-                    existingStudent.setAvatar(student.getAvatar());
-                }
-                if (student.getCreateDate() != null) {
-                    existingStudent.setCreateDate(student.getCreateDate());
-                }
-                if (student.getCreateName() != null) {
-                    existingStudent.setCreateName(student.getCreateName());
-                }
-                if (student.getUpdateDate() != null) {
-                    existingStudent.setUpdateDate(student.getUpdateDate());
-                }
-                if (student.getUpdateName() != null) {
-                    existingStudent.setUpdateName(student.getUpdateName());
-                }
+            .map(
+                existingStudent -> {
+                    if (student.getCode() != null) {
+                        existingStudent.setCode(student.getCode());
+                    }
+                    if (student.getFullName() != null) {
+                        existingStudent.setFullName(student.getFullName());
+                    }
+                    if (student.getEmail() != null) {
+                        existingStudent.setEmail(student.getEmail());
+                    }
+                    if (student.getPhone() != null) {
+                        existingStudent.setPhone(student.getPhone());
+                    }
+                    if (student.getStatus() != null) {
+                        existingStudent.setStatus(student.getStatus());
+                    }
+                    if (student.getAvatar() != null) {
+                        existingStudent.setAvatar(student.getAvatar());
+                    }
+                    if (student.getCreateDate() != null) {
+                        existingStudent.setCreateDate(student.getCreateDate());
+                    }
+                    if (student.getCreateName() != null) {
+                        existingStudent.setCreateName(student.getCreateName());
+                    }
+                    if (student.getUpdateDate() != null) {
+                        existingStudent.setUpdateDate(student.getUpdateDate());
+                    }
+                    if (student.getUpdateName() != null) {
+                        existingStudent.setUpdateName(student.getUpdateName());
+                    }
 
-                return existingStudent;
-            })
+                    return existingStudent;
+                }
+            )
             .map(studentRepository::save);
 
         return ResponseUtil.wrapOrNotFound(
@@ -188,17 +253,53 @@ public class StudentResource {
 
     /**
      * {@code DELETE  /students/:id} : delete the "id" student.
-     *
-     * @param id the id of the student to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
-    @DeleteMapping("/students/{id}")
-    public ResponseEntity<Void> deleteStudent(@PathVariable Long id) {
-        log.debug("REST request to delete Student : {}", id);
-        studentRepository.deleteById(id);
+    @PostMapping("/students/delete")
+    public ResponseEntity<?> deleteStudents(@RequestBody Student student) {
+        log.debug("REST request to delete Student : {}", student);
+        Student studentUpdate = studentRepository.findById(student.getId()).get();
+        Optional<User> userCreate = userService.getUserWithAuthorities();
+        studentUpdate.setUpdateName(userCreate.get().getLogin());
+        studentUpdate.setUpdateDate(Instant.now());
+        studentUpdate.setStatus(false);
+        studentUpdate = studentRepository.save(studentUpdate);
+        return ResponseEntity.ok().body(studentUpdate);
+    }
+
+    @PostMapping("/students/search")
+    public ResponseEntity<?> search(
+        @RequestBody SearchTeacherDTO searchTeacherDTO,
+        @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
+        @RequestParam(value = "page-size", required = false, defaultValue = "10") Integer pageSize
+    ) {
+        Map<String, Object> result = studentService.search(searchTeacherDTO, page, pageSize);
+        return ResponseEntity.ok().body(result);
+    }
+
+    @PostMapping("/students/export")
+    public ResponseEntity<?> export(@RequestBody SearchTeacherDTO searchTeacherDTO) throws Exception {
+        List<StudentDTO> listData = studentService.exportData(searchTeacherDTO);
+        List<ExcelColumn> lstColumn = buildColumnExport();
+        String title = "Danh sách sinh viên";
+        ExcelTitle excelTitle = new ExcelTitle(title, "", "");
+        ByteArrayInputStream byteArrayInputStream = exportUtils.onExport(lstColumn, listData, 3, 0, excelTitle, true);
+        InputStreamResource resource = new InputStreamResource(byteArrayInputStream);
         return ResponseEntity
-            .noContent()
-            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
-            .build();
+            .ok()
+            .contentLength(byteArrayInputStream.available())
+            .contentType(MediaType.parseMediaType("application/octet-stream"))
+            .body(resource);
+    }
+
+    private List<ExcelColumn> buildColumnExport() {
+        List<ExcelColumn> lstColumn = new ArrayList<>();
+        lstColumn.add(new ExcelColumn("code", "Mã sinh viên", ExcelColumn.ALIGN_MENT.LEFT));
+        lstColumn.add(new ExcelColumn("fullName", "Tên sinh viên", ExcelColumn.ALIGN_MENT.LEFT));
+        lstColumn.add(new ExcelColumn("email", "Email", ExcelColumn.ALIGN_MENT.LEFT));
+        lstColumn.add(new ExcelColumn("phone", "Số điện thoại", ExcelColumn.ALIGN_MENT.LEFT));
+        lstColumn.add(new ExcelColumn("createDate", "Ngày tạo", ExcelColumn.ALIGN_MENT.LEFT));
+        lstColumn.add(new ExcelColumn("createName", "Người tạo", ExcelColumn.ALIGN_MENT.LEFT));
+        return lstColumn;
     }
 }

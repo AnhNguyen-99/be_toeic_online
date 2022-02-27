@@ -9,13 +9,11 @@ import com.toeic.online.service.TeacherService;
 import com.toeic.online.service.UserService;
 import com.toeic.online.service.dto.*;
 import com.toeic.online.web.rest.errors.BadRequestAlertException;
-
 import java.io.ByteArrayInputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Instant;
 import java.util.*;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -50,7 +48,12 @@ public class TeacherResource {
 
     private final ExportUtils exportUtils;
 
-    public TeacherResource(TeacherRepository teacherRepository, UserService userService, TeacherService teacherService, ExportUtils exportUtils) {
+    public TeacherResource(
+        TeacherRepository teacherRepository,
+        UserService userService,
+        TeacherService teacherService,
+        ExportUtils exportUtils
+    ) {
         this.teacherRepository = teacherRepository;
         this.userService = userService;
         this.teacherService = teacherService;
@@ -67,31 +70,51 @@ public class TeacherResource {
     @PostMapping("/teachers")
     public ResponseEntity<Teacher> createTeacher(@RequestBody Teacher teacher) throws URISyntaxException {
         log.debug("REST request to save Teacher : {}", teacher);
-        if (teacher.getId() != null) {
-            throw new BadRequestAlertException("A new teacher cannot already have an ID", ENTITY_NAME, "idexists");
-        }
+        //        if (teacher.getId() != null) {
+        //            throw new BadRequestAlertException("A new teacher cannot already have an ID", ENTITY_NAME, "idexists");
+        //        }
         Optional<User> userCreate = userService.getUserWithAuthorities();
-        teacher.setCreateName(userCreate.get().getLogin());
-        teacher.setCreateDate(Instant.now());
+        Long idTeacher = teacher.getId();
+        if (teacher.getId() == null) {
+            teacher.setCreateName(userCreate.get().getLogin());
+            teacher.setCreateDate(Instant.now());
+        } else {
+            Teacher teacherOld = teacherRepository.findById(teacher.getId()).get();
+            teacher.setCreateName(teacherOld.getCreateName());
+            teacher.setCreateDate(teacherOld.getCreateDate());
+            teacher.setUpdateDate(Instant.now());
+            teacher.setUpdateName(userCreate.get().getLogin());
+        }
+        teacher.setCode(teacher.getCode().toLowerCase());
         teacher.setStatus(true);
         Teacher result = teacherRepository.save(teacher);
         // Lưu thông gv vào bảng jhi_use
-        User user = new User();
-        user.setLogin(teacher.getCode());
-        user.setFullName(teacher.getFullName());
-        user.setPhoneNumber(teacher.getPhone());
-        user.setImageUrl(teacher.getAvatar());
-        user.setActivated(true);
-        user.setEmail(teacher.getEmail());
-        user.setCreatedDate(Instant.now());
-        user.setCreatedBy(teacher.getCreateName());
-        user.setLastModifiedBy(teacher.getCreateName());
-        user.setLastModifiedDate(Instant.now());
-        Set<Authority> authorities = new HashSet<>();
-        Authority authority = new Authority("ROLE_GV");
-        authorities.add(authority);
-        user.setAuthorities(authorities);
-        user = userService.save(user);
+        if (idTeacher == null) {
+            User user = new User();
+            user.setLogin(teacher.getCode());
+            user.setFullName(teacher.getFullName());
+            user.setPhoneNumber(teacher.getPhone());
+            user.setImageUrl(teacher.getAvatar());
+            user.setActivated(true);
+            user.setEmail(teacher.getEmail());
+            user.setCreatedDate(Instant.now());
+            user.setCreatedBy(teacher.getCreateName());
+            user.setLastModifiedBy(teacher.getCreateName());
+            user.setLastModifiedDate(Instant.now());
+            Set<Authority> authorities = new HashSet<>();
+            Authority authority = new Authority("ROLE_GV");
+            authorities.add(authority);
+            user.setAuthorities(authorities);
+            user = userService.save(user);
+        } else {
+            User userUpdate = userService.findByLogin(teacher.getCode()).get();
+            userUpdate.setLogin(teacher.getCode());
+            userUpdate.setFullName(teacher.getFullName());
+            userUpdate.setPhoneNumber(teacher.getPhone());
+            userUpdate.setImageUrl(teacher.getAvatar());
+            userUpdate.setEmail(teacher.getEmail());
+            userUpdate = userService.update(userUpdate);
+        }
         return ResponseEntity
             .created(new URI("/api/teachers/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
@@ -160,40 +183,42 @@ public class TeacherResource {
 
         Optional<Teacher> result = teacherRepository
             .findById(teacher.getId())
-            .map(existingTeacher -> {
-                if (teacher.getCode() != null) {
-                    existingTeacher.setCode(teacher.getCode());
-                }
-                if (teacher.getFullName() != null) {
-                    existingTeacher.setFullName(teacher.getFullName());
-                }
-                if (teacher.getEmail() != null) {
-                    existingTeacher.setEmail(teacher.getEmail());
-                }
-                if (teacher.getPhone() != null) {
-                    existingTeacher.setPhone(teacher.getPhone());
-                }
-                if (teacher.getStatus() != null) {
-                    existingTeacher.setStatus(teacher.getStatus());
-                }
-                if (teacher.getAvatar() != null) {
-                    existingTeacher.setAvatar(teacher.getAvatar());
-                }
-                if (teacher.getCreateDate() != null) {
-                    existingTeacher.setCreateDate(teacher.getCreateDate());
-                }
-                if (teacher.getCreateName() != null) {
-                    existingTeacher.setCreateName(teacher.getCreateName());
-                }
-                if (teacher.getUpdateDate() != null) {
-                    existingTeacher.setUpdateDate(teacher.getUpdateDate());
-                }
-                if (teacher.getUpdateName() != null) {
-                    existingTeacher.setUpdateName(teacher.getUpdateName());
-                }
+            .map(
+                existingTeacher -> {
+                    if (teacher.getCode() != null) {
+                        existingTeacher.setCode(teacher.getCode());
+                    }
+                    if (teacher.getFullName() != null) {
+                        existingTeacher.setFullName(teacher.getFullName());
+                    }
+                    if (teacher.getEmail() != null) {
+                        existingTeacher.setEmail(teacher.getEmail());
+                    }
+                    if (teacher.getPhone() != null) {
+                        existingTeacher.setPhone(teacher.getPhone());
+                    }
+                    if (teacher.getStatus() != null) {
+                        existingTeacher.setStatus(teacher.getStatus());
+                    }
+                    if (teacher.getAvatar() != null) {
+                        existingTeacher.setAvatar(teacher.getAvatar());
+                    }
+                    if (teacher.getCreateDate() != null) {
+                        existingTeacher.setCreateDate(teacher.getCreateDate());
+                    }
+                    if (teacher.getCreateName() != null) {
+                        existingTeacher.setCreateName(teacher.getCreateName());
+                    }
+                    if (teacher.getUpdateDate() != null) {
+                        existingTeacher.setUpdateDate(teacher.getUpdateDate());
+                    }
+                    if (teacher.getUpdateName() != null) {
+                        existingTeacher.setUpdateName(teacher.getUpdateName());
+                    }
 
-                return existingTeacher;
-            })
+                    return existingTeacher;
+                }
+            )
             .map(teacherRepository::save);
 
         return ResponseUtil.wrapOrNotFound(
@@ -228,24 +253,26 @@ public class TeacherResource {
 
     /**
      * {@code DELETE  /teachers/:id} : delete the "id" teacher.
-     *
-     * @param id the id of the teacher to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
-    @DeleteMapping("/teachers/{id}")
-    public ResponseEntity<Void> deleteTeacher(@PathVariable Long id) {
-        log.debug("REST request to delete Teacher : {}", id);
-        teacherRepository.deleteById(id);
-        return ResponseEntity
-            .noContent()
-            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
-            .build();
+    @PostMapping("/teachers/delete")
+    public ResponseEntity<?> deleteTeacher(@RequestBody Teacher teacher) {
+        log.debug("REST request to delete Teacher : {}", teacher);
+        Teacher teacherUpdate = teacherRepository.findById(teacher.getId()).get();
+        Optional<User> userCreate = userService.getUserWithAuthorities();
+        teacherUpdate.setUpdateName(userCreate.get().getLogin());
+        teacherUpdate.setUpdateDate(Instant.now());
+        teacherUpdate.setStatus(false);
+        teacherUpdate = teacherRepository.save(teacherUpdate);
+        return ResponseEntity.ok().body(teacherUpdate);
     }
 
     @PostMapping("/teachers/search")
-    public ResponseEntity<?> search(@RequestBody SearchTeacherDTO searchTeacherDTO,
-                                    @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
-                                    @RequestParam(value = "page-size", required = false, defaultValue = "10") Integer pageSize){
+    public ResponseEntity<?> search(
+        @RequestBody SearchTeacherDTO searchTeacherDTO,
+        @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
+        @RequestParam(value = "page-size", required = false, defaultValue = "10") Integer pageSize
+    ) {
         Map<String, Object> result = teacherService.search(searchTeacherDTO, page, pageSize);
         return ResponseEntity.ok().body(result);
     }
@@ -258,20 +285,21 @@ public class TeacherResource {
         ExcelTitle excelTitle = new ExcelTitle(title, "", "");
         ByteArrayInputStream byteArrayInputStream = exportUtils.onExport(lstColumn, listData, 3, 0, excelTitle, true);
         InputStreamResource resource = new InputStreamResource(byteArrayInputStream);
-        return ResponseEntity.ok()
+        return ResponseEntity
+            .ok()
             .contentLength(byteArrayInputStream.available())
             .contentType(MediaType.parseMediaType("application/octet-stream"))
             .body(resource);
     }
 
-    private List<ExcelColumn> buildColumnExport(){
+    private List<ExcelColumn> buildColumnExport() {
         List<ExcelColumn> lstColumn = new ArrayList<>();
         lstColumn.add(new ExcelColumn("code", "Mã giảng viên", ExcelColumn.ALIGN_MENT.LEFT));
-        lstColumn.add(new ExcelColumn("fullName", "Tên giảng viên",ExcelColumn.ALIGN_MENT.LEFT));
-        lstColumn.add(new ExcelColumn("email", "Email",ExcelColumn.ALIGN_MENT.LEFT));
-        lstColumn.add(new ExcelColumn("phone", "Số điện thoại",ExcelColumn.ALIGN_MENT.LEFT));
-        lstColumn.add(new ExcelColumn("createDate", "Ngày tạo",ExcelColumn.ALIGN_MENT.LEFT));
-        lstColumn.add(new ExcelColumn("createName", "Người tạo",ExcelColumn.ALIGN_MENT.LEFT));
+        lstColumn.add(new ExcelColumn("fullName", "Tên giảng viên", ExcelColumn.ALIGN_MENT.LEFT));
+        lstColumn.add(new ExcelColumn("email", "Email", ExcelColumn.ALIGN_MENT.LEFT));
+        lstColumn.add(new ExcelColumn("phone", "Số điện thoại", ExcelColumn.ALIGN_MENT.LEFT));
+        lstColumn.add(new ExcelColumn("createDate", "Ngày tạo", ExcelColumn.ALIGN_MENT.LEFT));
+        lstColumn.add(new ExcelColumn("createName", "Người tạo", ExcelColumn.ALIGN_MENT.LEFT));
         return lstColumn;
     }
 }

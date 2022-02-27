@@ -1,7 +1,8 @@
 package com.toeic.online.repository.impl;
 
-import com.toeic.online.repository.TeacherRepositoryCustom;
+import com.toeic.online.repository.StudentRepositoryCustom;
 import com.toeic.online.service.dto.SearchTeacherDTO;
+import com.toeic.online.service.dto.StudentDTO;
 import com.toeic.online.service.dto.TeacherDTO;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -15,18 +16,18 @@ import org.hibernate.type.StringType;
 import org.springframework.stereotype.Component;
 
 @Component
-public class TeacherRepositoryCustomImpl implements TeacherRepositoryCustom {
+public class StudentRepositoryCustomImpl implements StudentRepositoryCustom {
 
     private EntityManager entityManager;
 
-    public TeacherRepositoryCustomImpl(EntityManager entityManager) {
+    public StudentRepositoryCustomImpl(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
 
     @Override
-    public List<TeacherDTO> search(SearchTeacherDTO searchTeacherDTO, Integer page, Integer pageSize) {
+    public List<StudentDTO> search(SearchTeacherDTO searchTeacherDTO, Integer page, Integer pageSize) {
         StringBuilder sql = new StringBuilder(
-            "SELECT " +
+            "SELECT" +
             " t.id, " +
             " t.code," +
             " t.full_name as fullName, " +
@@ -36,7 +37,7 @@ public class TeacherRepositoryCustomImpl implements TeacherRepositoryCustom {
             " case when t.status = 0 then 'Đang khóa' else 'Đang hoạt động' end as statusStr, " +
             " t.create_date as createDate," +
             " t.create_name as createName " +
-            " FROM teacher t" +
+            " FROM student t" +
             " WHERE 1 = 1 "
         );
         if (!searchTeacherDTO.getName().isEmpty()) {
@@ -56,7 +57,7 @@ public class TeacherRepositoryCustomImpl implements TeacherRepositoryCustom {
             }
             sql.append("  LIMIT " + offset + " , " + pageSize + " ");
         }
-        NativeQuery<TeacherDTO> query = ((Session) entityManager.getDelegate()).createNativeQuery(sql.toString());
+        NativeQuery<StudentDTO> query = ((Session) entityManager.getDelegate()).createNativeQuery(sql.toString());
         query
             .addScalar("code", new StringType())
             .addScalar("id", new LongType())
@@ -67,7 +68,7 @@ public class TeacherRepositoryCustomImpl implements TeacherRepositoryCustom {
             .addScalar("statusStr", new StringType())
             .addScalar("createDate", new InstantType())
             .addScalar("createName", new StringType())
-            .setResultTransformer(Transformers.aliasToBean(TeacherDTO.class));
+            .setResultTransformer(Transformers.aliasToBean(StudentDTO.class));
         if (!searchTeacherDTO.getName().isEmpty()) {
             query.setParameter("name", searchTeacherDTO.getName());
         }
@@ -78,7 +79,7 @@ public class TeacherRepositoryCustomImpl implements TeacherRepositoryCustom {
     }
 
     @Override
-    public List<TeacherDTO> exportData(SearchTeacherDTO searchTeacherDTO) {
+    public List<StudentDTO> exportData(SearchTeacherDTO searchTeacherDTO) {
         StringBuilder sql = new StringBuilder(
             "SELECT" +
             " t.code," +
@@ -89,7 +90,7 @@ public class TeacherRepositoryCustomImpl implements TeacherRepositoryCustom {
             " case when t.status = 0 then 'Đang khóa' else 'Đang hoạt động' end as statusStr, " +
             " t.create_date as createDate," +
             " t.create_name as createName " +
-            " FROM teacher t" +
+            " FROM student t" +
             " WHERE 1 = 1 "
         );
         if (!searchTeacherDTO.getName().isEmpty()) {
@@ -100,7 +101,7 @@ public class TeacherRepositoryCustomImpl implements TeacherRepositoryCustom {
         if (null != searchTeacherDTO.getStatus()) {
             sql.append(" AND t.status = :status");
         }
-        NativeQuery<TeacherDTO> query = ((Session) entityManager.getDelegate()).createNativeQuery(sql.toString());
+        NativeQuery<StudentDTO> query = ((Session) entityManager.getDelegate()).createNativeQuery(sql.toString());
         query
             .addScalar("code", new StringType())
             .addScalar("fullName", new StringType())
@@ -110,7 +111,7 @@ public class TeacherRepositoryCustomImpl implements TeacherRepositoryCustom {
             .addScalar("statusStr", new StringType())
             .addScalar("createDate", new InstantType())
             .addScalar("createName", new StringType())
-            .setResultTransformer(Transformers.aliasToBean(TeacherDTO.class));
+            .setResultTransformer(Transformers.aliasToBean(StudentDTO.class));
         if (!searchTeacherDTO.getName().isEmpty()) {
             query.setParameter("name", searchTeacherDTO.getName());
         }
