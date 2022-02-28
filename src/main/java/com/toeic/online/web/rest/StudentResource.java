@@ -264,6 +264,11 @@ public class StudentResource {
         studentUpdate.setUpdateDate(Instant.now());
         studentUpdate.setStatus(false);
         studentUpdate = studentRepository.save(studentUpdate);
+        User userUpdate = userService.findByLogin(student.getCode()).get();
+        if (userUpdate != null) {
+            userUpdate.setActivated(false);
+            userUpdate = userService.update(userUpdate);
+        }
         return ResponseEntity.ok().body(studentUpdate);
     }
 

@@ -264,6 +264,12 @@ public class TeacherResource {
         teacherUpdate.setUpdateDate(Instant.now());
         teacherUpdate.setStatus(false);
         teacherUpdate = teacherRepository.save(teacherUpdate);
+        // Update lại trạng thái user
+        User userUpdate = userService.findByLogin(teacher.getCode()).get();
+        if (userUpdate != null) {
+            userUpdate.setActivated(false);
+            userUpdate = userService.update(userUpdate);
+        }
         return ResponseEntity.ok().body(teacherUpdate);
     }
 
