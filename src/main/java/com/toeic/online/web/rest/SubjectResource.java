@@ -12,6 +12,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.Instant;
 import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -217,18 +218,18 @@ public class SubjectResource {
 
     /**
      * {@code DELETE  /subjects/:id} : delete the "id" subject.
-     *
-     * @param id the id of the subject to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
-    @DeleteMapping("/subjects/{id}")
-    public ResponseEntity<Void> deleteSubject(@PathVariable Long id) {
-        log.debug("REST request to delete Subject : {}", id);
-        subjectRepository.deleteById(id);
-        return ResponseEntity
-            .noContent()
-            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
-            .build();
+    @PostMapping("/subjects/delete")
+    public ResponseEntity<?> deleteSubject(@RequestBody Subject subject) {
+        log.debug("REST request to delete Subject : {}", subject);
+        Subject subjectOld = subjectRepository.findById(subject.getId()).get();
+        Optional<User> userCreate = userService.getUserWithAuthorities();
+        subjectOld.setStatus(false);
+        subjectOld.setUpdateDate(Instant.now());
+        subjectOld.setUpdateName(userCreate.get().getLogin());
+        subjectRepository.save(subjectOld);
+        return ResponseEntity.ok().body(subjectOld);
     }
 
     @PostMapping("subjects/export")

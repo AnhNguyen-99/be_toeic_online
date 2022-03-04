@@ -15,6 +15,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.Instant;
 import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -225,18 +226,18 @@ public class ClassroomResource {
 
     /**
      * {@code DELETE  /classrooms/:id} : delete the "id" classroom.
-     *
-     * @param id the id of the classroom to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
-    @DeleteMapping("/classrooms/{id}")
-    public ResponseEntity<Void> deleteClassroom(@PathVariable Long id) {
-        log.debug("REST request to delete Classroom : {}", id);
-        classroomRepository.deleteById(id);
-        return ResponseEntity
-            .noContent()
-            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
-            .build();
+    @PostMapping("/classrooms/delete")
+    public ResponseEntity<?> deleteClassroom(@RequestBody Classroom classroom) {
+        log.debug("REST request to delete Classroom : {}", classroom);
+        Classroom classroomOld = classroomRepository.findById(classroom.getId()).get();
+        Optional<User> userCreate = userService.getUserWithAuthorities();
+        classroomOld.setStatus(false);
+        classroomOld.setUpdateDate(Instant.now());
+        classroomOld.setUpdateName(userCreate.get().getLogin());
+        classroomRepository.save(classroomOld);
+        return ResponseEntity.ok().body(classroomOld);
     }
 
     @PostMapping("classrooms/export")

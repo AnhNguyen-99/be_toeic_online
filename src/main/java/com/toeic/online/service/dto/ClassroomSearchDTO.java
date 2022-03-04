@@ -13,4 +13,5 @@ public class ClassroomSearchDTO {
 
     private String name;
     private String teacherCode;
+    private Integer status;
 }
