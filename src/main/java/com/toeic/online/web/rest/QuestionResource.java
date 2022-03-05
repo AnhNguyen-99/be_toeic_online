@@ -1,11 +1,18 @@
 package com.toeic.online.web.rest;
 
 import com.toeic.online.domain.Question;
+import com.toeic.online.domain.User;
 import com.toeic.online.repository.QuestionRepository;
+import com.toeic.online.service.QuestionService;
+import com.toeic.online.service.UserService;
+import com.toeic.online.service.dto.QuestionDTO;
+import com.toeic.online.service.dto.SearchQuestionDTO;
 import com.toeic.online.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import org.slf4j.Logger;
@@ -34,8 +41,14 @@ public class QuestionResource {
 
     private final QuestionRepository questionRepository;
 
-    public QuestionResource(QuestionRepository questionRepository) {
+    private final UserService userService;
+
+    private final QuestionService questionService;
+
+    public QuestionResource(QuestionRepository questionRepository, UserService userService, QuestionService questionService) {
         this.questionRepository = questionRepository;
+        this.userService = userService;
+        this.questionService = questionService;
     }
 
     /**
@@ -47,10 +60,19 @@ public class QuestionResource {
      */
     @PostMapping("/questions")
     public ResponseEntity<Question> createQuestion(@RequestBody Question question) throws URISyntaxException {
-        log.debug("REST request to save Question : {}", question);
-        if (question.getId() != null) {
-            throw new BadRequestAlertException("A new question cannot already have an ID", ENTITY_NAME, "idexists");
+        //        log.debug("REST request to save Question : {}", question);
+        //        if (question.getId() != null) {
+        //            throw new BadRequestAlertException("A new question cannot already have an ID", ENTITY_NAME, "idexists");
+        //        }
+        Optional<User> userLogin = userService.getUserWithAuthorities();
+        if (question.getId() == null) {
+            question.setCreateDate(Instant.now());
+            question.setCreateName(userLogin.get().getLogin());
+        } else {
+            question.setUpdateDate(Instant.now());
+            question.setUpdateName(userLogin.get().getLogin());
         }
+        question.setStatus(true);
         Question result = questionRepository.save(question);
         return ResponseEntity
             .created(new URI("/api/questions/" + result.getId()))
@@ -122,40 +144,42 @@ public class QuestionResource {
 
         Optional<Question> result = questionRepository
             .findById(question.getId())
-            .map(existingQuestion -> {
-                if (question.getQuestionType() != null) {
-                    existingQuestion.setQuestionType(question.getQuestionType());
-                }
-                if (question.getQuestionText() != null) {
-                    existingQuestion.setQuestionText(question.getQuestionText());
-                }
-                if (question.getSubjectCode() != null) {
-                    existingQuestion.setSubjectCode(question.getSubjectCode());
-                }
-                if (question.getLevel() != null) {
-                    existingQuestion.setLevel(question.getLevel());
-                }
-                if (question.getPoint() != null) {
-                    existingQuestion.setPoint(question.getPoint());
-                }
-                if (question.getStatus() != null) {
-                    existingQuestion.setStatus(question.getStatus());
-                }
-                if (question.getCreateDate() != null) {
-                    existingQuestion.setCreateDate(question.getCreateDate());
-                }
-                if (question.getCreateName() != null) {
-                    existingQuestion.setCreateName(question.getCreateName());
-                }
-                if (question.getUpdateDate() != null) {
-                    existingQuestion.setUpdateDate(question.getUpdateDate());
-                }
-                if (question.getUpdateName() != null) {
-                    existingQuestion.setUpdateName(question.getUpdateName());
-                }
+            .map(
+                existingQuestion -> {
+                    if (question.getQuestionType() != null) {
+                        existingQuestion.setQuestionType(question.getQuestionType());
+                    }
+                    if (question.getQuestionText() != null) {
+                        existingQuestion.setQuestionText(question.getQuestionText());
+                    }
+                    if (question.getSubjectCode() != null) {
+                        existingQuestion.setSubjectCode(question.getSubjectCode());
+                    }
+                    if (question.getLevel() != null) {
+                        existingQuestion.setLevel(question.getLevel());
+                    }
+                    if (question.getPoint() != null) {
+                        existingQuestion.setPoint(question.getPoint());
+                    }
+                    if (question.getStatus() != null) {
+                        existingQuestion.setStatus(question.getStatus());
+                    }
+                    if (question.getCreateDate() != null) {
+                        existingQuestion.setCreateDate(question.getCreateDate());
+                    }
+                    if (question.getCreateName() != null) {
+                        existingQuestion.setCreateName(question.getCreateName());
+                    }
+                    if (question.getUpdateDate() != null) {
+                        existingQuestion.setUpdateDate(question.getUpdateDate());
+                    }
+                    if (question.getUpdateName() != null) {
+                        existingQuestion.setUpdateName(question.getUpdateName());
+                    }
 
-                return existingQuestion;
-            })
+                    return existingQuestion;
+                }
+            )
             .map(questionRepository::save);
 
         return ResponseUtil.wrapOrNotFound(
@@ -202,5 +226,21 @@ public class QuestionResource {
             .noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
+    }
+
+    @PostMapping("/questions/search")
+    public ResponseEntity<?> search(
+        @RequestBody SearchQuestionDTO searchQuestionDTO,
+        @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
+        @RequestParam(value = "page-size", required = false, defaultValue = "10") Integer pageSize
+    ) {
+        Map<String, Object> result = questionService.search(searchQuestionDTO, page, pageSize);
+        return ResponseEntity.ok().body(result);
+    }
+
+    @PostMapping("/questions/findByQuestion")
+    public ResponseEntity<?> findByQuestionId(@RequestBody Long id) {
+        QuestionDTO questionDTO = questionService.findById(id);
+        return ResponseEntity.ok().body(questionDTO);
     }
 }
