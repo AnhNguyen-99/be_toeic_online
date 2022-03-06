@@ -3,15 +3,14 @@ package com.toeic.online.web.rest;
 import com.toeic.online.domain.Exam;
 import com.toeic.online.domain.User;
 import com.toeic.online.repository.ExamRepository;
+import com.toeic.online.service.ExamService;
 import com.toeic.online.service.UserService;
+import com.toeic.online.service.dto.ClassroomSearchDTO;
 import com.toeic.online.service.dto.ExamDTO;
 import com.toeic.online.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -40,15 +39,18 @@ public class ExamResource {
 
     private final UserService userService;
 
-    public ExamResource(ExamRepository examRepository, UserService userService) {
+    private final ExamService examService;
+
+    public ExamResource(ExamRepository examRepository, UserService userService, ExamService examService) {
         this.examRepository = examRepository;
         this.userService = userService;
+        this.examService = examService;
     }
 
     /**
      * {@code POST  /exams} : Create a new exam.
      *
-     * @param exam the exam to create.
+     * @param examDTO the exam to create.
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new exam, or with status {@code 400 (Bad Request)} if the exam has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
@@ -235,5 +237,15 @@ public class ExamResource {
         exam.setQuestionData(examDTO.getQuestionData());
         exam.setTitle(examDTO.getTitle());
         return exam;
+    }
+
+    @PostMapping("/exams/search")
+    public ResponseEntity<?> search(
+        @RequestBody ClassroomSearchDTO classroomSearchDTO,
+        @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
+        @RequestParam(value = "page-size", required = false, defaultValue = "10") Integer pageSize
+    ) {
+        Map<String, Object> result = examService.search(classroomSearchDTO, page, pageSize);
+        return ResponseEntity.ok().body(result);
     }
 }

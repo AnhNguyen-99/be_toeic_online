@@ -25,6 +25,8 @@ public class ExamDTO {
 
     private String subjectCode;
 
+    private String subjectName;
+
     private String title;
 
     private Boolean status;
