@@ -1,6 +1,7 @@
 package com.toeic.online.repository;
 
 import com.toeic.online.domain.Question;
+import java.util.List;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.stereotype.Repository;
 

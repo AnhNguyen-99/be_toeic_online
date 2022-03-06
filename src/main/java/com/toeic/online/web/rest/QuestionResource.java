@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import javax.ws.rs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -242,5 +243,12 @@ public class QuestionResource {
     public ResponseEntity<?> findByQuestionId(@RequestBody Long id) {
         QuestionDTO questionDTO = questionService.findById(id);
         return ResponseEntity.ok().body(questionDTO);
+    }
+
+    // Tìm kiếm các các câu hỏi theo subjectCode
+    @PostMapping("/questions/findBySubjectCode")
+    public ResponseEntity<?> findBySubjectCode(@RequestBody SearchQuestionDTO searchQuestionDTO) {
+        List<QuestionDTO> lstQuestion = questionService.export(searchQuestionDTO);
+        return ResponseEntity.ok().body(lstQuestion);
     }
 }

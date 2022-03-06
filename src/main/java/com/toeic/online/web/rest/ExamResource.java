@@ -1,10 +1,14 @@
 package com.toeic.online.web.rest;
 
 import com.toeic.online.domain.Exam;
+import com.toeic.online.domain.User;
 import com.toeic.online.repository.ExamRepository;
+import com.toeic.online.service.UserService;
+import com.toeic.online.service.dto.ExamDTO;
 import com.toeic.online.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -34,8 +38,11 @@ public class ExamResource {
 
     private final ExamRepository examRepository;
 
-    public ExamResource(ExamRepository examRepository) {
+    private final UserService userService;
+
+    public ExamResource(ExamRepository examRepository, UserService userService) {
         this.examRepository = examRepository;
+        this.userService = userService;
     }
 
     /**
@@ -46,11 +53,24 @@ public class ExamResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("/exams")
-    public ResponseEntity<Exam> createExam(@RequestBody Exam exam) throws URISyntaxException {
-        log.debug("REST request to save Exam : {}", exam);
-        if (exam.getId() != null) {
-            throw new BadRequestAlertException("A new exam cannot already have an ID", ENTITY_NAME, "idexists");
+    public ResponseEntity<Exam> createExam(@RequestBody ExamDTO examDTO) throws URISyntaxException {
+        log.debug("REST request to save Exam : {}", examDTO);
+        //        if (exam.getId() != null) {
+        //            throw new BadRequestAlertException("A new exam cannot already have an ID", ENTITY_NAME, "idexists");
+        //        }
+        Exam exam = this.convertExamt(examDTO);
+        Optional<User> userLogin = userService.getUserWithAuthorities();
+        if (exam.getId() == null) {
+            exam.setCreateName(userLogin.get().getLogin());
+            exam.setCreateDate(new Date().toInstant());
+        } else {
+            Exam examOld = examRepository.findById(exam.getId()).get();
+            exam.setCreateDate(examOld.getCreateDate());
+            exam.setCreateName(examOld.getCreateName());
+            exam.setUpdateDate(new Date().toInstant());
+            exam.setUpdateName(userLogin.get().getLogin());
         }
+        exam.setStatus(true);
         Exam result = examRepository.save(exam);
         return ResponseEntity
             .created(new URI("/api/exams/" + result.getId()))
@@ -118,43 +138,45 @@ public class ExamResource {
 
         Optional<Exam> result = examRepository
             .findById(exam.getId())
-            .map(existingExam -> {
-                if (exam.getBeginExam() != null) {
-                    existingExam.setBeginExam(exam.getBeginExam());
-                }
-                if (exam.getDurationExam() != null) {
-                    existingExam.setDurationExam(exam.getDurationExam());
-                }
-                if (exam.getFinishExam() != null) {
-                    existingExam.setFinishExam(exam.getFinishExam());
-                }
-                if (exam.getQuestionData() != null) {
-                    existingExam.setQuestionData(exam.getQuestionData());
-                }
-                if (exam.getSubjectCode() != null) {
-                    existingExam.setSubjectCode(exam.getSubjectCode());
-                }
-                if (exam.getTitle() != null) {
-                    existingExam.setTitle(exam.getTitle());
-                }
-                if (exam.getStatus() != null) {
-                    existingExam.setStatus(exam.getStatus());
-                }
-                if (exam.getCreateDate() != null) {
-                    existingExam.setCreateDate(exam.getCreateDate());
-                }
-                if (exam.getCreateName() != null) {
-                    existingExam.setCreateName(exam.getCreateName());
-                }
-                if (exam.getUpdateDate() != null) {
-                    existingExam.setUpdateDate(exam.getUpdateDate());
-                }
-                if (exam.getUpdateName() != null) {
-                    existingExam.setUpdateName(exam.getUpdateName());
-                }
+            .map(
+                existingExam -> {
+                    if (exam.getBeginExam() != null) {
+                        existingExam.setBeginExam(exam.getBeginExam());
+                    }
+                    if (exam.getDurationExam() != null) {
+                        existingExam.setDurationExam(exam.getDurationExam());
+                    }
+                    if (exam.getFinishExam() != null) {
+                        existingExam.setFinishExam(exam.getFinishExam());
+                    }
+                    if (exam.getQuestionData() != null) {
+                        existingExam.setQuestionData(exam.getQuestionData());
+                    }
+                    if (exam.getSubjectCode() != null) {
+                        existingExam.setSubjectCode(exam.getSubjectCode());
+                    }
+                    if (exam.getTitle() != null) {
+                        existingExam.setTitle(exam.getTitle());
+                    }
+                    if (exam.getStatus() != null) {
+                        existingExam.setStatus(exam.getStatus());
+                    }
+                    if (exam.getCreateDate() != null) {
+                        existingExam.setCreateDate(exam.getCreateDate());
+                    }
+                    if (exam.getCreateName() != null) {
+                        existingExam.setCreateName(exam.getCreateName());
+                    }
+                    if (exam.getUpdateDate() != null) {
+                        existingExam.setUpdateDate(exam.getUpdateDate());
+                    }
+                    if (exam.getUpdateName() != null) {
+                        existingExam.setUpdateName(exam.getUpdateName());
+                    }
 
-                return existingExam;
-            })
+                    return existingExam;
+                }
+            )
             .map(examRepository::save);
 
         return ResponseUtil.wrapOrNotFound(
@@ -201,5 +223,17 @@ public class ExamResource {
             .noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
+    }
+
+    // Mapper examDTO => exam
+    public Exam convertExamt(ExamDTO examDTO) {
+        Exam exam = new Exam();
+        exam.setBeginExam(examDTO.getBeginExam().toInstant());
+        exam.setFinishExam(examDTO.getFinishExam().toInstant());
+        exam.setDurationExam(examDTO.getDurationExam());
+        exam.setSubjectCode(examDTO.getSubjectCode());
+        exam.setQuestionData(examDTO.getQuestionData());
+        exam.setTitle(examDTO.getTitle());
+        return exam;
     }
 }
