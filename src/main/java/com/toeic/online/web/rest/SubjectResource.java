@@ -290,4 +290,10 @@ public class SubjectResource {
         Subject subject = subjectRepository.findByCode(code);
         return ResponseEntity.ok().body(subject);
     }
+
+    @GetMapping("/subjects/findByClassroomCode/{code}")
+    public ResponseEntity<?> findByClassroomCode(@PathVariable String code) {
+        List<Subject> lstSubject = subjectRepository.findByClassCode(code);
+        return ResponseEntity.ok().body(lstSubject);
+    }
 }
