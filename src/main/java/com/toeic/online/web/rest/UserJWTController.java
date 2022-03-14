@@ -37,7 +37,12 @@ public class UserJWTController {
 
     private final UserMapper userMapper;
 
-    public UserJWTController(TokenProvider tokenProvider, AuthenticationManagerBuilder authenticationManagerBuilder, UserService userService, UserMapper userMapper) {
+    public UserJWTController(
+        TokenProvider tokenProvider,
+        AuthenticationManagerBuilder authenticationManagerBuilder,
+        UserService userService,
+        UserMapper userMapper
+    ) {
         this.tokenProvider = tokenProvider;
         this.authenticationManagerBuilder = authenticationManagerBuilder;
         this.userService = userService;
@@ -51,21 +56,21 @@ public class UserJWTController {
             loginVM.getPassword()
         );
 
-        try{
+        try {
             Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
             SecurityContextHolder.getContext().setAuthentication(authentication);
             String jwt = tokenProvider.createToken(authentication, loginVM.isRememberMe());
-            User user = userService.getUserWithAuthoritiesByLogin(authentication.getName()).orElse(new User());
+            User user = userService.getUserWithAuthoritiesByLogin(loginVM.getUsername()).orElse(new User());
             AdminUserDTO userDTO = userMapper.userToAdminUserDTO(user);
             JwtResponse jwtResponse = new JwtResponse(jwt, userDTO);
             HttpHeaders httpHeaders = new HttpHeaders();
             httpHeaders.add(JWTFilter.AUTHORIZATION_HEADER, "Bearer " + jwt);
             return new ResponseEntity<>(jwtResponse, httpHeaders, HttpStatus.OK);
-        }catch (UserNotActivatedException e) {
+        } catch (UserNotActivatedException e) {
             throw new UserNotActivatedException(e.getMessage());
-        }catch (InternalAuthenticationServiceException eux){
+        } catch (InternalAuthenticationServiceException eux) {
             throw new UserNotActivatedException("Tài khoản bị khóa");
-        }catch (AuthenticationException ex) {
+        } catch (AuthenticationException ex) {
             throw new UserNotActivatedException("Đăng nhập không thành công");
         }
     }
@@ -78,7 +83,7 @@ public class UserJWTController {
         private String jwttoken;
         private AdminUserDTO currentUser;
 
-        JWTToken(String jwt, AdminUserDTO userDTO){
+        JWTToken(String jwt, AdminUserDTO userDTO) {
             this.jwttoken = jwt;
             this.currentUser = userDTO;
         }
@@ -92,10 +97,11 @@ public class UserJWTController {
             this.jwttoken = jwttoken;
         }
 
-        AdminUserDTO getCurrentUser(){
+        AdminUserDTO getCurrentUser() {
             return currentUser;
         }
-        void setCurrentUser(AdminUserDTO userDTO){
+
+        void setCurrentUser(AdminUserDTO userDTO) {
             this.currentUser = userDTO;
         }
     }
