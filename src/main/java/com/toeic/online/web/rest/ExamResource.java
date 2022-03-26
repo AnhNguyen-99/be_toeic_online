@@ -248,4 +248,11 @@ public class ExamResource {
         Map<String, Object> result = examService.search(classroomSearchDTO, page, pageSize);
         return ResponseEntity.ok().body(result);
     }
+
+    // List bài thi theo mã sv
+    @GetMapping("/exams/getListByStudentCode/{studentCode}")
+    public ResponseEntity<?> getListExamsByStudentCode(@PathVariable String studentCode) {
+        List<ExamDTO> list = examService.getListExamByStudentCode(studentCode);
+        return ResponseEntity.ok().body(list);
+    }
 }

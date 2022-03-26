@@ -74,11 +74,11 @@ class MailServiceIT {
 
     @Test
     void testSendEmail() throws Exception {
-        mailService.sendEmail("john.doe@example.com", "testSubject", "testContent", false, false);
+        mailService.sendEmail("nguyenleanh3101@gmail.com", "test send mail", "testContent", false, false);
         verify(javaMailSender).send(messageCaptor.capture());
         MimeMessage message = messageCaptor.getValue();
-        assertThat(message.getSubject()).isEqualTo("testSubject");
-        assertThat(message.getAllRecipients()[0]).hasToString("john.doe@example.com");
+        assertThat(message.getSubject()).isEqualTo("test send mail");
+        assertThat(message.getAllRecipients()[0]).hasToString("nguyenleanh3101@gmail.com");
         assertThat(message.getFrom()[0]).hasToString(jHipsterProperties.getMail().getFrom());
         assertThat(message.getContent()).isInstanceOf(String.class);
         assertThat(message.getContent()).hasToString("testContent");

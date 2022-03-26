@@ -113,4 +113,38 @@ public class ExamRepositoryCustomImpl implements ExamRepositoryCustom {
         }
         return query.list();
     }
+
+    @Override
+    public List<ExamDTO> getListExamByStudentCode(String studentCode) {
+        StringBuilder sql = new StringBuilder();
+        sql.append(
+            "SELECT ex.title as title, \n" +
+            " ex.id as id, \n" +
+            " ex.begin_exam as beginExam, \n" +
+            " ex.duration_exam as durationExam, \n" +
+            " ex.finish_exam as finishExam, \n" +
+            " s.name as subjectName \n" +
+            " FROM exam ex join subject s on ex.subject_code = s.code\n" +
+            " join classroom c on s.class_code = c.code\n" +
+            " join classroom_student cs on cs.class_code = c.code\n" +
+            " join student su on su.code = cs.student_code\n" +
+            " WHERE 1 = 1"
+        );
+        if (null != studentCode) {
+            sql.append(" AND su.code = :studentCode ");
+        }
+        NativeQuery<ExamDTO> query = ((Session) entityManager.getDelegate()).createNativeQuery(sql.toString());
+        query
+            .addScalar("id", new LongType())
+            .addScalar("title", new StringType())
+            .addScalar("subjectName", new StringType())
+            .addScalar("beginExam", new DateType())
+            .addScalar("finishExam", new DateType())
+            .addScalar("durationExam", new IntegerType())
+            .setResultTransformer(Transformers.aliasToBean(ExamDTO.class));
+        if (null != studentCode) {
+            query.setParameter("studentCode", studentCode);
+        }
+        return query.list();
+    }
 }

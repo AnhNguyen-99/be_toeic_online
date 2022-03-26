@@ -2,6 +2,7 @@ package com.toeic.online.service.dto;
 
 import java.time.Instant;
 import java.util.Date;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -38,4 +39,6 @@ public class ExamDTO {
     private Instant updateDate;
 
     private String updateName;
+
+    private List<QuestionDTO> lstQuestion;
 }

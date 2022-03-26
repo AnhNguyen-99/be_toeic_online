@@ -2,6 +2,9 @@ package com.toeic.online.web.rest;
 
 import com.toeic.online.domain.ExamUser;
 import com.toeic.online.repository.ExamUserRepository;
+import com.toeic.online.service.ExamService;
+import com.toeic.online.service.dto.ExamDTO;
+import com.toeic.online.service.dto.QuestionDTO;
 import com.toeic.online.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -34,8 +37,11 @@ public class ExamUserResource {
 
     private final ExamUserRepository examUserRepository;
 
-    public ExamUserResource(ExamUserRepository examUserRepository) {
+    private final ExamService examService;
+
+    public ExamUserResource(ExamUserRepository examUserRepository, ExamService examService) {
         this.examUserRepository = examUserRepository;
+        this.examService = examService;
     }
 
     /**
@@ -122,31 +128,33 @@ public class ExamUserResource {
 
         Optional<ExamUser> result = examUserRepository
             .findById(examUser.getId())
-            .map(existingExamUser -> {
-                if (examUser.getStudentCode() != null) {
-                    existingExamUser.setStudentCode(examUser.getStudentCode());
-                }
-                if (examUser.getExamId() != null) {
-                    existingExamUser.setExamId(examUser.getExamId());
-                }
-                if (examUser.getTotalPoint() != null) {
-                    existingExamUser.setTotalPoint(examUser.getTotalPoint());
-                }
-                if (examUser.getAnswerSheet() != null) {
-                    existingExamUser.setAnswerSheet(examUser.getAnswerSheet());
-                }
-                if (examUser.getTimeStart() != null) {
-                    existingExamUser.setTimeStart(examUser.getTimeStart());
-                }
-                if (examUser.getTimeFinish() != null) {
-                    existingExamUser.setTimeFinish(examUser.getTimeFinish());
-                }
-                if (examUser.getTimeRemaining() != null) {
-                    existingExamUser.setTimeRemaining(examUser.getTimeRemaining());
-                }
+            .map(
+                existingExamUser -> {
+                    if (examUser.getStudentCode() != null) {
+                        existingExamUser.setStudentCode(examUser.getStudentCode());
+                    }
+                    if (examUser.getExamId() != null) {
+                        existingExamUser.setExamId(examUser.getExamId());
+                    }
+                    if (examUser.getTotalPoint() != null) {
+                        existingExamUser.setTotalPoint(examUser.getTotalPoint());
+                    }
+                    if (examUser.getAnswerSheet() != null) {
+                        existingExamUser.setAnswerSheet(examUser.getAnswerSheet());
+                    }
+                    if (examUser.getTimeStart() != null) {
+                        existingExamUser.setTimeStart(examUser.getTimeStart());
+                    }
+                    if (examUser.getTimeFinish() != null) {
+                        existingExamUser.setTimeFinish(examUser.getTimeFinish());
+                    }
+                    if (examUser.getTimeRemaining() != null) {
+                        existingExamUser.setTimeRemaining(examUser.getTimeRemaining());
+                    }
 
-                return existingExamUser;
-            })
+                    return existingExamUser;
+                }
+            )
             .map(examUserRepository::save);
 
         return ResponseUtil.wrapOrNotFound(
@@ -193,5 +201,12 @@ public class ExamUserResource {
             .noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
+    }
+
+    // Lấy thông tin data của bài thi
+    @GetMapping("/exam-users/findByExamId/{id}")
+    public ResponseEntity<?> findByExamId(@PathVariable Long id) {
+        ExamDTO examDTO = examService.dataExamStudent(id);
+        return ResponseEntity.ok().body(examDTO);
     }
 }

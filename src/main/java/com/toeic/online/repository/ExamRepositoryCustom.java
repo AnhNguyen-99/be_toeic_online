@@ -11,4 +11,6 @@ public interface ExamRepositoryCustom {
     List<ExamDTO> search(ClassroomSearchDTO subjectCode, Integer page, Integer pageSize);
 
     List<ExamDTO> export(ClassroomSearchDTO subjectCode);
+
+    List<ExamDTO> getListExamByStudentCode(String studentCode);
 }

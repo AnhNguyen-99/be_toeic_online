@@ -9,4 +9,8 @@ public interface ExamService {
     Map<String, Object> search(ClassroomSearchDTO subjectCode, Integer page, Integer pageSize);
 
     List<ExamDTO> export(ClassroomSearchDTO subjectCode);
+
+    List<ExamDTO> getListExamByStudentCode(String studentCode);
+
+    ExamDTO dataExamStudent(Long id);
 }
