@@ -7,6 +7,7 @@ import com.toeic.online.service.ExamService;
 import com.toeic.online.service.UserService;
 import com.toeic.online.service.dto.ClassroomSearchDTO;
 import com.toeic.online.service.dto.ExamDTO;
+import com.toeic.online.service.dto.StudentDTO;
 import com.toeic.online.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -254,5 +255,19 @@ public class ExamResource {
     public ResponseEntity<?> getListExamsByStudentCode(@PathVariable String studentCode) {
         List<ExamDTO> list = examService.getListExamByStudentCode(studentCode);
         return ResponseEntity.ok().body(list);
+    }
+
+    // Danh sách bài thi theo giáo viên
+    @GetMapping("/exams/findByTeacherCode/{teacherCode}")
+    public ResponseEntity<?> getListExamByTeacherCode(@PathVariable String teacherCode) {
+        List<Exam> lst = examRepository.getListExamByTeacherCode(teacherCode);
+        return ResponseEntity.ok().body(lst);
+    }
+
+    // Danh sách điểm của sv theo bài thi
+    @GetMapping("/exams/getPointExamStudent/{examId}")
+    public ResponseEntity<?> getPointExamStudent(@PathVariable Long examId) {
+        List<StudentDTO> lst = examService.getPointExamStudent(examId);
+        return ResponseEntity.ok().body(lst);
     }
 }

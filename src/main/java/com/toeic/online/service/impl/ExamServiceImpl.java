@@ -3,12 +3,14 @@ package com.toeic.online.service.impl;
 import com.toeic.online.domain.Exam;
 import com.toeic.online.repository.ExamRepository;
 import com.toeic.online.repository.QuestionRepositoryCustom;
+import com.toeic.online.repository.StudentRepositoryCustom;
 import com.toeic.online.repository.impl.ExamRepositoryCustomImpl;
 import com.toeic.online.service.ExamService;
 import com.toeic.online.service.QuestionService;
 import com.toeic.online.service.dto.ClassroomSearchDTO;
 import com.toeic.online.service.dto.ExamDTO;
 import com.toeic.online.service.dto.QuestionDTO;
+import com.toeic.online.service.dto.StudentDTO;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -25,16 +27,20 @@ public class ExamServiceImpl implements ExamService {
 
     private final QuestionService questionService;
 
+    private final StudentRepositoryCustom studentRepositoryCustom;
+
     public ExamServiceImpl(
         ExamRepositoryCustomImpl examRepositoryCustom,
         ExamRepository examRepository,
         QuestionRepositoryCustom questionRepositoryCustom,
-        QuestionService questionService
+        QuestionService questionService,
+        StudentRepositoryCustom studentRepositoryCustom
     ) {
         this.examRepositoryCustom = examRepositoryCustom;
         this.examRepository = examRepository;
         this.questionRepositoryCustom = questionRepositoryCustom;
         this.questionService = questionService;
+        this.studentRepositoryCustom = studentRepositoryCustom;
     }
 
     @Override
@@ -79,6 +85,11 @@ public class ExamServiceImpl implements ExamService {
             e.printStackTrace();
         }
         return examDTO;
+    }
+
+    @Override
+    public List<StudentDTO> getPointExamStudent(Long examId) {
+        return studentRepositoryCustom.getPointExamStudent(examId);
     }
 
     // Hàm lấy thông tin của ds câu hỏi

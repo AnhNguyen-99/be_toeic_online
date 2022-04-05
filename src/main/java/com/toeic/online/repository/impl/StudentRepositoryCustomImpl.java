@@ -9,10 +9,7 @@ import javax.persistence.EntityManager;
 import org.hibernate.Session;
 import org.hibernate.query.NativeQuery;
 import org.hibernate.transform.Transformers;
-import org.hibernate.type.BooleanType;
-import org.hibernate.type.InstantType;
-import org.hibernate.type.LongType;
-import org.hibernate.type.StringType;
+import org.hibernate.type.*;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -117,6 +114,49 @@ public class StudentRepositoryCustomImpl implements StudentRepositoryCustom {
         }
         if (null != searchTeacherDTO.getStatus()) {
             query.setParameter("status", searchTeacherDTO.getStatus());
+        }
+        return query.list();
+    }
+
+    @Override
+    public List<StudentDTO> getPointExamStudent(Long examId) {
+        StringBuilder sql = new StringBuilder(
+            "\n select distinct su.id as id,\n" +
+            " su.code as code,\n" +
+            " su.full_name as fullName,\n" +
+            " su.email as email,\n" +
+            " su.phone as phone,\n" +
+            " su.status as status,\n" +
+            " su.create_date as createDate,\n" +
+            " su.create_name as createName,\n" +
+            " su.update_date as updateDate,\n" +
+            " su.update_name as updateName,\n" +
+            " eu.total_point as point" +
+            " from exam ex join subject s on ex.subject_code = s.code\n" +
+            " join classroom c on s.class_code = c.code\n" +
+            " join teacher t on t.code = c.teacher_code\n" +
+            " join classroom_student cs on c.code = cs.class_code\n" +
+            " join student su on cs.student_code = su.code\n" +
+            " join exam_user eu on eu.exam_id = ex.id\n" +
+            " where 1 = 1 "
+        );
+        if (examId != null) {
+            sql.append(" and ex.id = :examId");
+        }
+        NativeQuery<StudentDTO> query = ((Session) entityManager.getDelegate()).createNativeQuery(sql.toString());
+        query
+            .addScalar("code", new StringType())
+            .addScalar("id", new LongType())
+            .addScalar("fullName", new StringType())
+            .addScalar("email", new StringType())
+            .addScalar("phone", new StringType())
+            .addScalar("status", new BooleanType())
+            .addScalar("createDate", new InstantType())
+            .addScalar("createName", new StringType())
+            .addScalar("point", new FloatType())
+            .setResultTransformer(Transformers.aliasToBean(StudentDTO.class));
+        if (examId != null) {
+            query.setParameter("examId", examId);
         }
         return query.list();
     }

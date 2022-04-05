@@ -10,4 +10,6 @@ public interface StudentRepositoryCustom {
     List<StudentDTO> search(SearchTeacherDTO searchTeacherDTO, Integer page, Integer pageSize);
 
     List<StudentDTO> exportData(SearchTeacherDTO searchTeacherDTO);
+
+    List<StudentDTO> getPointExamStudent(Long examId);
 }

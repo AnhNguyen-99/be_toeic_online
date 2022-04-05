@@ -24,4 +24,6 @@ public class StudentDTO {
     private String createName;
     private Instant updateDate;
     private String updateName;
+    // Điểm số dùng trong khi xem điểm của bài thi
+    private Float point;
 }
