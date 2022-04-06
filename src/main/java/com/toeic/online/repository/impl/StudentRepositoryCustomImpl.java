@@ -121,23 +121,23 @@ public class StudentRepositoryCustomImpl implements StudentRepositoryCustom {
     @Override
     public List<StudentDTO> getPointExamStudent(Long examId) {
         StringBuilder sql = new StringBuilder(
-            "\n select distinct su.id as id,\n" +
-            " su.code as code,\n" +
-            " su.full_name as fullName,\n" +
-            " su.email as email,\n" +
-            " su.phone as phone,\n" +
-            " su.status as status,\n" +
-            " su.create_date as createDate,\n" +
-            " su.create_name as createName,\n" +
-            " su.update_date as updateDate,\n" +
-            " su.update_name as updateName,\n" +
-            " eu.total_point as point" +
-            " from exam ex join subject s on ex.subject_code = s.code\n" +
-            " join classroom c on s.class_code = c.code\n" +
-            " join teacher t on t.code = c.teacher_code\n" +
-            " join classroom_student cs on c.code = cs.class_code\n" +
-            " join student su on cs.student_code = su.code\n" +
-            " join exam_user eu on eu.exam_id = ex.id\n" +
+            "\n select distinct s.id as id,\n" +
+            " s.code as code,\n" +
+            " s.full_name as fullName,\n" +
+            " s.email as email,\n" +
+            " s.phone as phone,\n" +
+            " s.status as status,\n" +
+            " s.create_date as createDate,\n" +
+            " s.create_name as createName,\n" +
+            " s.update_date as updateDate,\n" +
+            " s.update_name as updateName,\n" +
+            " ifnull(b2.total_point, 0) as point\n" +
+            " from classroom_student cs join student s on cs.student_code = s.code\n" +
+            " left join subject sb on cs.class_code = sb.class_code\n" +
+            " left join exam ex on sb.code = ex.subject_code\n" +
+            " left join exam_user eu on ex.id = eu.exam_id\n" +
+            " left join (select eu.* from exam ex join exam_user eu on ex.id = eu.exam_id\n" +
+            " left join student st on eu.student_code = st.code where ex.id = :examId) as b2 on b2.student_code = s.code\n" +
             " where 1 = 1 "
         );
         if (examId != null) {
