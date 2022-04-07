@@ -1,9 +1,12 @@
 package com.toeic.online.web.rest;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.toeic.online.domain.ExamUser;
 import com.toeic.online.repository.ExamUserRepository;
 import com.toeic.online.service.ExamService;
 import com.toeic.online.service.dto.ExamDTO;
+import com.toeic.online.service.dto.ExamStudentDTO;
 import com.toeic.online.service.dto.QuestionDTO;
 import com.toeic.online.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
@@ -47,16 +50,29 @@ public class ExamUserResource {
     /**
      * {@code POST  /exam-users} : Create a new examUser.
      *
-     * @param examUser the examUser to create.
+     * @param examUserDTO the examUser to create.
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new examUser, or with status {@code 400 (Bad Request)} if the examUser has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("/exam-users")
-    public ResponseEntity<ExamUser> createExamUser(@RequestBody ExamUser examUser) throws URISyntaxException {
-        log.debug("REST request to save ExamUser : {}", examUser);
-        if (examUser.getId() != null) {
+    public ResponseEntity<ExamUser> createExamUser(@RequestBody ExamStudentDTO examUserDTO)
+        throws URISyntaxException, JsonProcessingException {
+        log.debug("REST request to save ExamUser : {}", examUserDTO);
+        if (examUserDTO.getId() != null) {
             throw new BadRequestAlertException("A new examUser cannot already have an ID", ENTITY_NAME, "idexists");
         }
+        // Convert dto to entity
+        ExamUser examUser = new ExamUser();
+        examUser.setId(examUserDTO.getId());
+        examUser.setStudentCode(examUserDTO.getStudentCode());
+        examUser.setExamId(examUserDTO.getExamId());
+        examUser.setTotalPoint(examUserDTO.getTotalPoint());
+        examUser.setTimeFinish(examUserDTO.getTimeFinish());
+        examUser.setTimeRemaining(examUserDTO.getTimeRemaining());
+        examUser.setTimeStart(examUserDTO.getTimeStart());
+        ObjectMapper mapper = new ObjectMapper();
+        String answerSheetConvertToJson = mapper.writeValueAsString(examUserDTO.getLstQuestion());
+        examUser.setAnswerSheet(answerSheetConvertToJson);
         ExamUser result = examUserRepository.save(examUser);
         return ResponseEntity
             .created(new URI("/api/exam-users/" + result.getId()))

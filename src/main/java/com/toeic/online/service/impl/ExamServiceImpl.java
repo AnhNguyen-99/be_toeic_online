@@ -100,6 +100,7 @@ public class ExamServiceImpl implements ExamService {
         for (int i = 0; i < lstId.length; i++) {
             // Tìm data question
             QuestionDTO questionDTO = questionService.findById(lstId[i]);
+            questionDTO.setCreateDate(null);
             lstQuestion.add(questionDTO);
         }
         return lstQuestion;
