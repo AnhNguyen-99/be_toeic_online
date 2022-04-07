@@ -27,5 +27,5 @@ public class QuestionDTO {
     private String createName;
     private Instant updateDate;
     private String updateName;
-    private List<Choice> lstChoice;
+    private List<ChoiceDTO> lstChoice;
 }

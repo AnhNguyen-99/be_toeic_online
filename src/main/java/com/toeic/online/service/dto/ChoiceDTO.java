@@ -15,4 +15,5 @@ public class ChoiceDTO {
     private Long questionId;
     private String choiceText;
     private String corrected;
+    private String choice;
 }

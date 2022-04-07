@@ -4,8 +4,10 @@ import com.toeic.online.domain.Choice;
 import com.toeic.online.repository.ChoiceRepository;
 import com.toeic.online.repository.impl.QuestionRepositoryCustomImpl;
 import com.toeic.online.service.QuestionService;
+import com.toeic.online.service.dto.ChoiceDTO;
 import com.toeic.online.service.dto.QuestionDTO;
 import com.toeic.online.service.dto.SearchQuestionDTO;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +45,17 @@ public class QuestionServiceImpl implements QuestionService {
         QuestionDTO questionDTO = questionRepositoryCustomImpl.findByQuestionId(id);
         // Đáp án câu hỏi
         List<Choice> lstChoice = choiceRepository.getListChoiceByQuestionId(questionDTO.getId());
-        questionDTO.setLstChoice(lstChoice);
+        List<ChoiceDTO> lstDTO = new ArrayList<>();
+        for (Choice choice : lstChoice) {
+            ChoiceDTO choiceDTO = new ChoiceDTO();
+            choiceDTO.setId(choice.getId());
+            choiceDTO.setQuestionId(choice.getQuestionId());
+            choiceDTO.setChoiceText(choice.getChoiceText());
+            choiceDTO.setCorrected(choice.getCorrected());
+            //            choiceDTO.setChoice(null);
+            lstDTO.add(choiceDTO);
+        }
+        questionDTO.setLstChoice(lstDTO);
         return questionDTO;
     }
 }

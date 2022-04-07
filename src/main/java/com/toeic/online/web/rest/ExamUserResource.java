@@ -197,10 +197,9 @@ public class ExamUserResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the examUser, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/exam-users/{id}")
-    public ResponseEntity<ExamUser> getExamUser(@PathVariable Long id) {
-        log.debug("REST request to get ExamUser : {}", id);
+    public ResponseEntity<?> getExamUser(@PathVariable Long id) {
         Optional<ExamUser> examUser = examUserRepository.findById(id);
-        return ResponseUtil.wrapOrNotFound(examUser);
+        return ResponseEntity.ok().body(examUser.get());
     }
 
     /**
