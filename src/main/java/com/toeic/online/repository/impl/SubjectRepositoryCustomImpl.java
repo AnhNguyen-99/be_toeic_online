@@ -27,7 +27,7 @@ public class SubjectRepositoryCustomImpl implements SubjectRepositoryCustom {
     @Override
     public List<SubjectDTO> exportData(SearchSubjectDTO searchSubjectDTO) {
         StringBuilder sql = new StringBuilder(
-            "SELECT" +
+            "SELECT distinct s.id, " +
             " s.code," +
             " s.name," +
             " c.name as className," +
@@ -71,7 +71,7 @@ public class SubjectRepositoryCustomImpl implements SubjectRepositoryCustom {
     @Override
     public List<SubjectDTO> search(SearchSubjectDTO searchSubjectDTO, Integer page, Integer pageSize) {
         StringBuilder sql = new StringBuilder(
-            "SELECT" +
+            "SELECT distinct" +
             " s.id, " +
             "s.code," +
             " s.name," +
