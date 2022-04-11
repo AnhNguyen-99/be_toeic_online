@@ -1,17 +1,8 @@
 package com.toeic.online.commons;
 
 import com.toeic.online.config.Constants;
-import com.toeic.online.service.dto.ExcelColumn;
 import com.toeic.online.service.dto.*;
-import org.apache.poi.hssf.usermodel.HSSFFont;
-import org.apache.poi.hssf.util.HSSFColor;
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.ss.util.CellRangeAddress;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
-
+import com.toeic.online.service.dto.ExcelColumn;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.lang.reflect.Field;
@@ -23,6 +14,14 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.apache.poi.hssf.usermodel.HSSFFont;
+import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 @Component
 public class ExportUtils {
@@ -377,7 +376,6 @@ public class ExportUtils {
         workbook.write(out);
         return new ByteArrayInputStream(out.toByteArray());
     }
-
 
     public CellStyle getCellStyle(Workbook workbook, HorizontalAlignment horizontalAlignment) {
         CellStyle cellStyleCenter = workbook.createCellStyle();
@@ -898,6 +896,7 @@ public class ExportUtils {
         fontHeaderBold.setFontHeightInPoints(new Short("12"));
         return fontHeaderBold;
     }
+
     public Font getFontHeader(Workbook workbook) {
         Font fontHeaderBold = workbook.createFont();
         fontHeaderBold.setBold(false);
@@ -912,5 +911,67 @@ public class ExportUtils {
         fontTimeNewRoman.setFontName("Times New Roman");
         fontTimeNewRoman.setFontHeightInPoints(new Short("12"));
         return fontTimeNewRoman;
+    }
+
+    public CellStyle getStyleHeader(Workbook wb, Font fontTimeNewRoman) {
+        CellStyle styleHeader = wb.createCellStyle();
+        styleHeader.setAlignment(HorizontalAlignment.CENTER);
+        styleHeader.setVerticalAlignment(VerticalAlignment.CENTER);
+        styleHeader.setWrapText(true);
+        styleHeader.setFont(fontTimeNewRoman);
+        styleHeader.setBorderTop(BorderStyle.THIN);
+        styleHeader.setBorderBottom(BorderStyle.THIN);
+        styleHeader.setBorderRight(BorderStyle.THIN);
+        styleHeader.setBorderLeft(BorderStyle.THIN);
+        return styleHeader;
+    }
+
+    public CellStyle getErrorStyle(Workbook workbook) {
+        CellStyle errStyle = workbook.createCellStyle();
+        errStyle.setWrapText(true);
+        errStyle.setTopBorderColor(IndexedColors.BLACK.getIndex());
+        errStyle.setBottomBorderColor(IndexedColors.BLACK.getIndex());
+        errStyle.setRightBorderColor(IndexedColors.BLACK.getIndex());
+        errStyle.setLeftBorderColor(IndexedColors.BLACK.getIndex());
+        errStyle.setBorderTop(BorderStyle.THIN);
+        errStyle.setBorderBottom(BorderStyle.THIN);
+        errStyle.setBorderRight(BorderStyle.THIN);
+        errStyle.setBorderLeft(BorderStyle.THIN);
+        Font fontDefault = workbook.createFont();
+        fontDefault.setColor(IndexedColors.RED.getIndex());
+        errStyle.setFont(fontDefault);
+        return errStyle;
+    }
+
+    public CellStyle getStyleErrTitle(Workbook workbook) {
+        CellStyle styleTitleErr = workbook.createCellStyle();
+        styleTitleErr.setTopBorderColor(IndexedColors.BLACK.getIndex());
+        styleTitleErr.setBottomBorderColor(IndexedColors.BLACK.getIndex());
+        styleTitleErr.setRightBorderColor(IndexedColors.BLACK.getIndex());
+        styleTitleErr.setLeftBorderColor(IndexedColors.BLACK.getIndex());
+        styleTitleErr.setBorderTop(BorderStyle.THIN);
+        styleTitleErr.setBorderBottom(BorderStyle.THIN);
+        styleTitleErr.setBorderRight(BorderStyle.THIN);
+        styleTitleErr.setBorderLeft(BorderStyle.THIN);
+        Font fontTitleErr = workbook.createFont();
+        fontTitleErr.setColor(IndexedColors.RED.getIndex());
+        fontTitleErr.setBold(true);
+        styleTitleErr.setFont(fontTitleErr);
+        styleTitleErr.setVerticalAlignment(VerticalAlignment.CENTER);
+        styleTitleErr.setAlignment(HorizontalAlignment.CENTER);
+        return styleTitleErr;
+    }
+
+    public CellStyle getStyleErrorBorder(Workbook workbook) {
+        CellStyle styleErr = workbook.createCellStyle();
+        styleErr.setBorderTop(BorderStyle.MEDIUM);
+        styleErr.setTopBorderColor(IndexedColors.RED.getIndex());
+        styleErr.setBorderBottom(BorderStyle.MEDIUM);
+        styleErr.setBottomBorderColor(IndexedColors.RED.getIndex());
+        styleErr.setBorderRight(BorderStyle.MEDIUM);
+        styleErr.setRightBorderColor(IndexedColors.RED.getIndex());
+        styleErr.setBorderLeft(BorderStyle.MEDIUM);
+        styleErr.setLeftBorderColor(IndexedColors.RED.getIndex());
+        return styleErr;
     }
 }

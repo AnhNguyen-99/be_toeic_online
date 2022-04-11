@@ -1,8 +1,10 @@
 package com.toeic.online.domain;
 
+import com.toeic.online.service.dto.ClassroomDTO;
 import java.io.Serializable;
 import java.time.Instant;
 import javax.persistence.*;
+import lombok.NoArgsConstructor;
 
 /**
  * A Classroom.
@@ -44,6 +46,8 @@ public class Classroom implements Serializable {
 
     @Column(name = "update_name")
     private String updateName;
+
+    public Classroom() {}
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -211,5 +215,17 @@ public class Classroom implements Serializable {
             ", updateDate='" + getUpdateDate() + "'" +
             ", updateName='" + getUpdateName() + "'" +
             "}";
+    }
+
+    public Classroom(ClassroomDTO dto) {
+        this.id = dto.getId();
+        this.code = dto.getCode();
+        this.name = dto.getName();
+        this.teacherCode = dto.getTeacherCode();
+        this.status = dto.getStatus();
+        this.createDate = dto.getCreateDate();
+        this.createName = dto.getCreateName();
+        this.updateDate = dto.getUpdateDate();
+        this.updateName = dto.getUpdateName();
     }
 }

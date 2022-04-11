@@ -130,6 +130,8 @@ spring:
         implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
   messages:
     basename: i18n/messages
+    fallback-to-system-locale: true
+    encoding: UTF-8
   main:
     allow-bean-definition-overriding: true
   task:
@@ -205,4 +207,8 @@ jhipster:
 # application:
 
 import-file:
+  folder: 'C:\'
   sample-file: 'src/main/resources/templates/'
+
+spring.servlet.multipart.max-file-size: 20MB
+spring.servlet.multipart.max-request-size: 20MB

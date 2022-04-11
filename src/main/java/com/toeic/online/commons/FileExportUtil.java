@@ -2,7 +2,6 @@ package com.toeic.online.commons;
 
 import com.toeic.online.constant.AppConstants;
 import com.toeic.online.service.dto.*;
-
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URLEncoder;
@@ -13,7 +12,6 @@ import java.util.*;
 import java.util.regex.Pattern;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.poi.common.usermodel.HyperlinkType;
 import org.apache.poi.hssf.util.HSSFColor;
@@ -27,7 +25,6 @@ import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -55,8 +52,8 @@ public class FileExportUtil {
      * @return byte[]
      * @throws IOException
      */
-    @SuppressWarnings({"rawtypes", "resource"})
-    public byte[] exportXLSX(Boolean isSample, List<SheetConfigDto> sheetConfigList, String title) throws Exception {
+    @SuppressWarnings({ "rawtypes", "resource" })
+    public byte[] exportXLSX(Boolean isSample, List<SheetConfigDTO> sheetConfigList, String title) throws Exception {
         XSSFWorkbook workbook = new XSSFWorkbook();
         //		XSSFWorkbook workbook = new SXSSFWorkbook(wbTemp, ONE_THOUSAND);
         XSSFSheet sheet = null;
@@ -135,7 +132,7 @@ public class FileExportUtil {
         XSSFHyperlink emailHyperLink = (XSSFHyperlink) createHelper.createHyperlink(HyperlinkType.EMAIL);
         DataValidationHelper dvHelper = new XSSFDataValidationHelper(sheet);
 
-        for (SheetConfigDto sheetConfig : sheetConfigList) {
+        for (SheetConfigDTO sheetConfig : sheetConfigList) {
             if (StringUtils.isNotNullOrEmpty(sheetConfig.getSheetName())) {
                 String sheetName = Translator.toLocale(sheetConfig.getSheetName());
                 if (StringUtils.isNotNullOrEmpty(sheetName)) {
@@ -242,7 +239,7 @@ public class FileExportUtil {
                     cell.setCellStyle(styleHeader);
                 }
             }
-            List<CellConfigDto> cellConfigList = sheetConfig.getCellConfigList();
+            List<CellConfigDTO> cellConfigList = sheetConfig.getCellConfigList();
             // write content
             for (Object object : list) {
                 List<String> listFieldErr = Arrays.asList(BeanUtils.getArrayProperty(object, "fieldErr"));
@@ -253,7 +250,7 @@ public class FileExportUtil {
                     cell.setCellValue(list.indexOf(object) + 1);
                     cell.setCellStyle(styleRight);
                 }
-                for (CellConfigDto cellConfig : cellConfigList) {
+                for (CellConfigDTO cellConfig : cellConfigList) {
                     cell = row.createCell(cellStart++);
                     try {
                         String cellValue = BeanUtils.getProperty(object, cellConfig.getFieldName());
@@ -279,7 +276,7 @@ public class FileExportUtil {
                         } else if (AppConstants.ERRORS.equals(cellConfig.getCellType())) {
                             cell.setCellValue(cellValueStr);
                             cell.setCellStyle(styleError);
-                        }else if (AppConstants.NO.equals(cellConfig.getCellType())) {
+                        } else if (AppConstants.NO.equals(cellConfig.getCellType())) {
                             cell.setCellValue(Long.valueOf(cellValueStr));
                         }
 
@@ -311,8 +308,7 @@ public class FileExportUtil {
                                         } else {
                                             cell.setCellStyle(hyperLinkStyle);
                                         }
-                                    }
-                                    else if(AppConstants.NO.equals(cellConfig.getCellType())){
+                                    } else if (AppConstants.NO.equals(cellConfig.getCellType())) {
                                         if (listFieldErr.contains(cellConfig.getFieldName())) {
                                             cell.setCellStyle(styleBorderErrorNo);
                                         } else {
@@ -335,10 +331,10 @@ public class FileExportUtil {
                 }
             }
 
-            List<CellConfigDto> cellCustomList = sheetConfig.getCellCustomList();
+            List<CellConfigDTO> cellCustomList = sheetConfig.getCellCustomList();
             if (StringUtils.isListNotNullOrEmpty(cellCustomList)) {
                 int countSheet = 1;
-                for (CellConfigDto i : cellCustomList) {
+                for (CellConfigDTO i : cellCustomList) {
                     DataValidation validation = creatDropDownList(sheet, dvHelper, workbook, i);
                     sheet.addValidationData(validation);
                     workbook.setSheetHidden(countSheet++, true);
@@ -381,7 +377,7 @@ public class FileExportUtil {
         XSSFSheet taskInfoSheet,
         DataValidationHelper helper,
         XSSFWorkbook book,
-        CellConfigDto dto
+        CellConfigDTO dto
     ) {
         XSSFSheet hidden = book.createSheet("hidden" + dto.getFieldName());
         Cell cell = null;
@@ -639,8 +635,7 @@ public class FileExportUtil {
                 map.put(String.valueOf(i), "-");
             }
         } else {
-            if (((year % 4 == 0) && (year % 100 != 0)) ||
-                (year % 400 == 0)) {
+            if (((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0)) {
                 for (int i = 1; i <= 29; i++) {
                     map.put(String.valueOf(i), "-");
                 }
@@ -674,13 +669,15 @@ public class FileExportUtil {
         for (int i = 1; i <= numberDay; i++) {
             switch (LocalDate.of(currentYear, month, i).getDayOfWeek()) {
                 case SATURDAY:
-                case SUNDAY: {
-                    result += 1;
-                    break;
-                }
-                default: {
-                    result += 0;
-                }
+                case SUNDAY:
+                    {
+                        result += 1;
+                        break;
+                    }
+                default:
+                    {
+                        result += 0;
+                    }
             }
         }
         return result;
@@ -702,10 +699,7 @@ public class FileExportUtil {
                             tag = true;
                             break;
                         }
-                    } catch (Exception e) {
-
-                    }
-
+                    } catch (Exception e) {}
                 }
                 if (tag) {
                     continue;
@@ -715,16 +709,17 @@ public class FileExportUtil {
                     case TUESDAY:
                     case WEDNESDAY:
                     case THURSDAY:
-                    case FRIDAY: {
-                        total += 1;
-                        break;
-
-                    }
+                    case FRIDAY:
+                        {
+                            total += 1;
+                            break;
+                        }
                     case SATURDAY:
-                    case SUNDAY: {
-                        totalMinus += 1;
-                        break;
-                    }
+                    case SUNDAY:
+                        {
+                            totalMinus += 1;
+                            break;
+                        }
                 }
             }
         } else {
@@ -733,14 +728,13 @@ public class FileExportUtil {
                     boolean tag = false;
                     for (String day : lstHoliday) {
                         try {
-                            if (LocalDate.parse(day, formatter).equals(LocalDate.of(laLocalDate.getYear(), laLocalDate.getMonthValue(), i))) {
+                            if (
+                                LocalDate.parse(day, formatter).equals(LocalDate.of(laLocalDate.getYear(), laLocalDate.getMonthValue(), i))
+                            ) {
                                 tag = true;
                                 break;
                             }
-                        } catch (Exception e) {
-
-                        }
-
+                        } catch (Exception e) {}
                     }
                     if (tag) {
                         continue;
@@ -750,30 +744,29 @@ public class FileExportUtil {
                         case TUESDAY:
                         case WEDNESDAY:
                         case THURSDAY:
-                        case FRIDAY: {
-                            total += 1;
-                            break;
-
-                        }
-                        default: {
-                            break;
-                        }
+                        case FRIDAY:
+                            {
+                                total += 1;
+                                break;
+                            }
+                        default:
+                            {
+                                break;
+                            }
                     }
                 }
             } else if (month == 4 | month == 6 | month == 9 | month == 11) {
-
                 for (int i = laLocalDate.getDayOfMonth(); i <= 30; i++) {
                     boolean tag = false;
                     for (String day : lstHoliday) {
                         try {
-                            if (LocalDate.parse(day, formatter).equals(LocalDate.of(laLocalDate.getYear(), laLocalDate.getMonthValue(), i))) {
+                            if (
+                                LocalDate.parse(day, formatter).equals(LocalDate.of(laLocalDate.getYear(), laLocalDate.getMonthValue(), i))
+                            ) {
                                 tag = true;
                                 break;
                             }
-                        } catch (Exception e) {
-
-                        }
-
+                        } catch (Exception e) {}
                     }
                     if (tag) {
                         continue;
@@ -783,33 +776,32 @@ public class FileExportUtil {
                         case TUESDAY:
                         case WEDNESDAY:
                         case THURSDAY:
-                        case FRIDAY: {
-                            total += 1;
-                            break;
-
-                        }
-                        default: {
-                            break;
-                        }
+                        case FRIDAY:
+                            {
+                                total += 1;
+                                break;
+                            }
+                        default:
+                            {
+                                break;
+                            }
                     }
                 }
-
             } else {
-                if (((year % 4 == 0) && (year % 100 != 0)) ||
-                    (year % 400 == 0)) {
-
+                if (((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0)) {
                     for (int i = laLocalDate.getDayOfMonth(); i <= 29; i++) {
                         boolean tag = false;
                         for (String day : lstHoliday) {
                             try {
-                                if (LocalDate.parse(day, formatter).equals(LocalDate.of(laLocalDate.getYear(), laLocalDate.getMonthValue(), i))) {
+                                if (
+                                    LocalDate
+                                        .parse(day, formatter)
+                                        .equals(LocalDate.of(laLocalDate.getYear(), laLocalDate.getMonthValue(), i))
+                                ) {
                                     tag = true;
                                     break;
                                 }
-                            } catch (Exception e) {
-
-                            }
-
+                            } catch (Exception e) {}
                         }
                         if (tag) {
                             continue;
@@ -820,9 +812,10 @@ public class FileExportUtil {
                             case WEDNESDAY:
                             case THURSDAY:
                             case FRIDAY:
-                            default: {
-                                break;
-                            }
+                            default:
+                                {
+                                    break;
+                                }
                         }
                     }
 
@@ -830,14 +823,15 @@ public class FileExportUtil {
                         boolean tag = false;
                         for (String day : lstHoliday) {
                             try {
-                                if (LocalDate.parse(day, formatter).equals(LocalDate.of(laLocalDate.getYear(), laLocalDate.getMonthValue(), i))) {
+                                if (
+                                    LocalDate
+                                        .parse(day, formatter)
+                                        .equals(LocalDate.of(laLocalDate.getYear(), laLocalDate.getMonthValue(), i))
+                                ) {
                                     tag = true;
                                     break;
                                 }
-                            } catch (Exception e) {
-
-                            }
-
+                            } catch (Exception e) {}
                         }
                         if (tag) {
                             continue;
@@ -847,14 +841,15 @@ public class FileExportUtil {
                             case TUESDAY:
                             case WEDNESDAY:
                             case THURSDAY:
-                            case FRIDAY: {
-                                total += 1;
-                                break;
-
-                            }
-                            default: {
-                                break;
-                            }
+                            case FRIDAY:
+                                {
+                                    total += 1;
+                                    break;
+                                }
+                            default:
+                                {
+                                    break;
+                                }
                         }
                     }
                 }
@@ -863,5 +858,4 @@ public class FileExportUtil {
 
         return (total);
     }
-
 }

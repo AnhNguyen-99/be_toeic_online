@@ -16,7 +16,7 @@ public class AppConstants {
     public static final String ARRAY = "ARRAY";
     public static final String ERRORS = "ERRORS";
     public static final String CENTER = "CENTER";
-    public static final String NO = "NO";
+    public static final String NO = "STT";
 
     public static final String SORT_ASC = "ASC";
     public static final String SORT_DESC = "DESC";
@@ -153,11 +153,12 @@ public class AppConstants {
     public static final int MONTH_END_OF_YEAR = 12;
     public static final String RUNNABLE = "True";
 
-    public static final String[] LIST_PHONE_NUMBER_9 = {"309", "304", "305", "302", "307"};
+    public static final String[] LIST_PHONE_NUMBER_9 = { "309", "304", "305", "302", "307" };
 
-    public static final String[] LIST_PHONE_NUMBER_10 = {"209", "205", "202", "207"};
+    public static final String[] LIST_PHONE_NUMBER_10 = { "209", "205", "202", "207" };
 
     public static class ValidatePhone {
+
         public static final Integer VALID = 0;
         public static final Integer INVALID = 3;
         public static final Integer INVALID_LENGTH_9 = 1;
@@ -168,6 +169,7 @@ public class AppConstants {
     }
 
     public static class Language {
+
         public static final String LA = "la";
         public static final String EN = "en";
         public static final String VN = "vn";

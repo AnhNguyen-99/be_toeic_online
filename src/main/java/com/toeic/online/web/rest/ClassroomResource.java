@@ -1,30 +1,34 @@
 package com.toeic.online.web.rest;
 
 import com.toeic.online.commons.ExportUtils;
+import com.toeic.online.commons.FileExportUtil;
+import com.toeic.online.commons.FileUtils;
+import com.toeic.online.constant.AppConstants;
 import com.toeic.online.domain.Classroom;
 import com.toeic.online.domain.User;
 import com.toeic.online.repository.ClassroomRepository;
 import com.toeic.online.service.ClassroomService;
 import com.toeic.online.service.UserService;
-import com.toeic.online.service.dto.ClassroomDTO;
-import com.toeic.online.service.dto.ClassroomSearchDTO;
-import com.toeic.online.service.dto.ExcelColumn;
-import com.toeic.online.service.dto.ExcelTitle;
+import com.toeic.online.service.dto.*;
 import com.toeic.online.web.rest.errors.BadRequestAlertException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.ResponseUtil;
 
@@ -46,8 +50,17 @@ public class ClassroomResource {
 
     private final ExportUtils exportUtils;
 
+    @Value("${import-file.sample-file}")
+    private String subFolder;
+
+    @Value("${import-file.folder}")
+    private String folder;
+
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
+
+    @Autowired
+    private FileExportUtil fileExportUtil;
 
     private final ClassroomRepository classroomRepository;
 
@@ -73,9 +86,6 @@ public class ClassroomResource {
     @PostMapping("/classrooms")
     public ResponseEntity<Classroom> createClassroom(@RequestBody Classroom classroom) throws URISyntaxException {
         log.debug("REST request to save Classroom : {}", classroom);
-        //        if (classroom.getId() != null) {
-        //            throw new BadRequestAlertException("A new classroom cannot already have an ID", ENTITY_NAME, "idexists");
-        //        }
         Optional<User> userLogin = userService.getUserWithAuthorities();
         if (classroom.getId() == null) {
             classroom.setCreateName(userLogin.get().getLogin());
@@ -291,5 +301,28 @@ public class ClassroomResource {
     ) {
         Map<String, Object> result = classroomService.search(classroomSearchDTO, page, pageSize);
         return ResponseEntity.ok().body(result);
+    }
+
+    // Import data by excel
+    @PostMapping("/classrooms/importData")
+    public ServiceResult<?> importData(@RequestParam("file") MultipartFile file, @RequestParam("typeImport") Long typeImport)
+        throws Exception {
+        return classroomService.importClassroom(file, typeImport);
+    }
+
+    @PostMapping("/classrooms/exportTemplate")
+    public ResponseEntity<?> exportTemplate() throws Exception {
+        log.info("REST request to export template Teacher");
+        byte[] fileData = classroomService.exportFileTemplate();
+        String fileName = "DS_Lophoc" + AppConstants.EXTENSION_XLSX;
+        return fileExportUtil.responseFileExportWithUtf8FileName(fileData, fileName, AppConstants.MIME_TYPE_XLSX);
+    }
+
+    @PostMapping("/classrooms/exportDataErrors")
+    public ResponseEntity<?> exportDataErrors(@RequestBody List<ClassroomDTO> lstError) throws Exception {
+        byte[] fileData = classroomService.exportExcelClassroomErrors(lstError);
+        SimpleDateFormat dateFormat = new SimpleDateFormat(AppConstants.YYYYMMDDHHSS);
+        String fileName = "DS_Lophoc_errors" + AppConstants.DOT + AppConstants.EXTENSION_XLSX;
+        return fileExportUtil.responseFileExportWithUtf8FileName(fileData, fileName, AppConstants.MIME_TYPE_XLSX);
     }
 }
