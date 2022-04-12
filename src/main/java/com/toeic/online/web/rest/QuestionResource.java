@@ -1,5 +1,7 @@
 package com.toeic.online.web.rest;
 
+import com.toeic.online.commons.FileExportUtil;
+import com.toeic.online.constant.AppConstants;
 import com.toeic.online.domain.Question;
 import com.toeic.online.domain.User;
 import com.toeic.online.repository.QuestionRepository;
@@ -18,6 +20,7 @@ import java.util.Optional;
 import javax.ws.rs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,6 +48,9 @@ public class QuestionResource {
     private final UserService userService;
 
     private final QuestionService questionService;
+
+    @Autowired
+    private FileExportUtil fileExportUtil;
 
     public QuestionResource(QuestionRepository questionRepository, UserService userService, QuestionService questionService) {
         this.questionRepository = questionRepository;
@@ -250,5 +256,13 @@ public class QuestionResource {
     public ResponseEntity<?> findBySubjectCode(@RequestBody SearchQuestionDTO searchQuestionDTO) {
         List<QuestionDTO> lstQuestion = questionService.export(searchQuestionDTO);
         return ResponseEntity.ok().body(lstQuestion);
+    }
+
+    @PostMapping("/questions/exportTemplate")
+    public ResponseEntity<?> exportTemplate() throws Exception {
+        log.info("REST request to export template Teacher");
+        byte[] fileData = questionService.exportFileTemplate();
+        String fileName = "DS_SV" + AppConstants.EXTENSION_XLSX;
+        return fileExportUtil.responseFileExportWithUtf8FileName(fileData, fileName, AppConstants.MIME_TYPE_XLSX);
     }
 }

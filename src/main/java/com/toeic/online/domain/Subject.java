@@ -1,5 +1,6 @@
 package com.toeic.online.domain;
 
+import com.toeic.online.service.dto.SubjectDTO;
 import java.io.Serializable;
 import java.time.Instant;
 import javax.persistence.*;
@@ -194,5 +195,19 @@ public class Subject implements Serializable {
             ", updateDate='" + getUpdateDate() + "'" +
             ", updateName='" + getUpdateName() + "'" +
             "}";
+    }
+
+    public Subject() {}
+
+    public Subject(SubjectDTO dto) {
+        this.id = dto.getId();
+        this.code = dto.getCode();
+        this.name = dto.getName();
+        this.classCode = dto.getClassCode();
+        this.status = dto.getStatus();
+        this.createDate = dto.getCreateDate();
+        this.createName = dto.getCreateName();
+        this.updateDate = dto.getUpdateDate();
+        this.updateName = dto.getUpdateName();
     }
 }

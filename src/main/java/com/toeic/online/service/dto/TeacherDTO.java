@@ -1,17 +1,16 @@
 package com.toeic.online.service.dto;
 
+import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.Instant;
-
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class TeacherDTO {
+public class TeacherDTO extends ExportDTO {
 
     private Long id;
     private String code;

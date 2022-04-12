@@ -1,6 +1,8 @@
 package com.toeic.online.web.rest;
 
 import com.toeic.online.commons.ExportUtils;
+import com.toeic.online.commons.FileExportUtil;
+import com.toeic.online.constant.AppConstants;
 import com.toeic.online.domain.Classroom;
 import com.toeic.online.domain.ClassroomStudent;
 import com.toeic.online.domain.Student;
@@ -8,24 +10,24 @@ import com.toeic.online.repository.ClassroomRepository;
 import com.toeic.online.repository.ClassroomStudentRepository;
 import com.toeic.online.repository.StudentRepository;
 import com.toeic.online.service.ClassroomStudentService;
-import com.toeic.online.service.dto.ClassroomStudentDTO;
-import com.toeic.online.service.dto.ClassroomStudentSearchDTO;
-import com.toeic.online.service.dto.ExcelColumn;
-import com.toeic.online.service.dto.ExcelTitle;
+import com.toeic.online.service.dto.*;
 import com.toeic.online.web.rest.errors.BadRequestAlertException;
 import java.io.ByteArrayInputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import javax.ws.rs.QueryParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.ResponseUtil;
 
@@ -53,6 +55,9 @@ public class ClassroomStudentResource {
     private final ExportUtils exportUtils;
 
     private final StudentRepository studentRepository;
+
+    @Autowired
+    private FileExportUtil fileExportUtil;
 
     public ClassroomStudentResource(
         ClassroomStudentService classroomStudentService,
@@ -272,5 +277,29 @@ public class ClassroomStudentResource {
         lstColumn.add(new ExcelColumn("email", "Email", ExcelColumn.ALIGN_MENT.LEFT));
         lstColumn.add(new ExcelColumn("phone", "Số điện thoại", ExcelColumn.ALIGN_MENT.LEFT));
         return lstColumn;
+    }
+
+    @PostMapping("/classroom-student/importData")
+    public ServiceResult<?> importData(
+        @RequestParam("file") MultipartFile file,
+        @RequestParam("classCode") String classCode,
+        @RequestParam("typeImport") Long typeImport
+    ) throws Exception {
+        return classroomStudentService.importClassroomStudent(file, classCode, typeImport);
+    }
+
+    @PostMapping("/classroom-student/exportTemplate")
+    public ResponseEntity<?> exportTemplate() throws Exception {
+        log.info("REST request to export template Teacher");
+        byte[] fileData = classroomStudentService.exportFileTemplate();
+        String fileName = "DS_Sinhvien_Lophoc" + AppConstants.EXTENSION_XLSX;
+        return fileExportUtil.responseFileExportWithUtf8FileName(fileData, fileName, AppConstants.MIME_TYPE_XLSX);
+    }
+
+    @PostMapping("/classroom-student/exportDataErrors")
+    public ResponseEntity<?> exportDataErrors(@RequestBody List<ClassroomStudentDTO> lstError) throws Exception {
+        byte[] fileData = classroomStudentService.exportExcelClassroomErrors(lstError);
+        String fileName = "DS_Sinhvien_Lophoc_errors" + AppConstants.DOT + AppConstants.EXTENSION_XLSX;
+        return fileExportUtil.responseFileExportWithUtf8FileName(fileData, fileName, AppConstants.MIME_TYPE_XLSX);
     }
 }

@@ -1,6 +1,8 @@
 package com.toeic.online.web.rest;
 
 import com.toeic.online.commons.ExportUtils;
+import com.toeic.online.commons.FileExportUtil;
+import com.toeic.online.constant.AppConstants;
 import com.toeic.online.domain.Authority;
 import com.toeic.online.domain.Teacher;
 import com.toeic.online.domain.User;
@@ -16,12 +18,14 @@ import java.time.Instant;
 import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.ResponseUtil;
 
@@ -47,6 +51,9 @@ public class TeacherResource {
     private final TeacherService teacherService;
 
     private final ExportUtils exportUtils;
+
+    @Autowired
+    private FileExportUtil fileExportUtil;
 
     public TeacherResource(
         TeacherRepository teacherRepository,
@@ -307,5 +314,26 @@ public class TeacherResource {
         lstColumn.add(new ExcelColumn("createDate", "Ngày tạo", ExcelColumn.ALIGN_MENT.LEFT));
         lstColumn.add(new ExcelColumn("createName", "Người tạo", ExcelColumn.ALIGN_MENT.LEFT));
         return lstColumn;
+    }
+
+    @PostMapping("/teachers/importData")
+    public ServiceResult<?> importData(@RequestParam("file") MultipartFile file, @RequestParam("typeImport") Long typeImport)
+        throws Exception {
+        return teacherService.importTeacher(file, typeImport);
+    }
+
+    @PostMapping("/teachers/exportTemplate")
+    public ResponseEntity<?> exportTemplate() throws Exception {
+        log.info("REST request to export template Teacher");
+        byte[] fileData = teacherService.exportFileTemplate();
+        String fileName = "DS_GV" + AppConstants.EXTENSION_XLSX;
+        return fileExportUtil.responseFileExportWithUtf8FileName(fileData, fileName, AppConstants.MIME_TYPE_XLSX);
+    }
+
+    @PostMapping("/teachers/exportDataErrors")
+    public ResponseEntity<?> exportDataErrors(@RequestBody List<TeacherDTO> lstError) throws Exception {
+        byte[] fileData = teacherService.exportExcelTeacherErrors(lstError);
+        String fileName = "DS_GV_errors" + AppConstants.DOT + AppConstants.EXTENSION_XLSX;
+        return fileExportUtil.responseFileExportWithUtf8FileName(fileData, fileName, AppConstants.MIME_TYPE_XLSX);
     }
 }

@@ -1,6 +1,8 @@
 package com.toeic.online.web.rest;
 
 import com.toeic.online.commons.ExportUtils;
+import com.toeic.online.commons.FileExportUtil;
+import com.toeic.online.constant.AppConstants;
 import com.toeic.online.domain.Subject;
 import com.toeic.online.domain.User;
 import com.toeic.online.repository.SubjectRepository;
@@ -12,16 +14,19 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.ResponseUtil;
 
@@ -47,6 +52,9 @@ public class SubjectResource {
     private final SubjectService subjectService;
 
     private final ExportUtils exportUtils;
+
+    @Autowired
+    private FileExportUtil fileExportUtil;
 
     public SubjectResource(
         SubjectRepository subjectRepository,
@@ -295,5 +303,26 @@ public class SubjectResource {
     public ResponseEntity<?> findByClassroomCode(@PathVariable String code) {
         List<Subject> lstSubject = subjectRepository.findByClassCode(code);
         return ResponseEntity.ok().body(lstSubject);
+    }
+
+    @PostMapping("/subjects/importData")
+    public ServiceResult<?> importData(@RequestParam("file") MultipartFile file, @RequestParam("typeImport") Long typeImport)
+        throws Exception {
+        return subjectService.importSubject(file, typeImport);
+    }
+
+    @PostMapping("/subjects/exportTemplate")
+    public ResponseEntity<?> exportTemplate() throws Exception {
+        log.info("REST request to export template Teacher");
+        byte[] fileData = subjectService.exportFileTemplate();
+        String fileName = "DS_Monhoc" + AppConstants.EXTENSION_XLSX;
+        return fileExportUtil.responseFileExportWithUtf8FileName(fileData, fileName, AppConstants.MIME_TYPE_XLSX);
+    }
+
+    @PostMapping("/subjects/exportDataErrors")
+    public ResponseEntity<?> exportDataErrors(@RequestBody List<SubjectDTO> lstError) throws Exception {
+        byte[] fileData = subjectService.exportExcelSubjectErrors(lstError);
+        String fileName = "DS_MonHoc_errors" + AppConstants.DOT + AppConstants.EXTENSION_XLSX;
+        return fileExportUtil.responseFileExportWithUtf8FileName(fileData, fileName, AppConstants.MIME_TYPE_XLSX);
     }
 }

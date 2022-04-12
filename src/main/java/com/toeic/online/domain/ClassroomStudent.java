@@ -1,5 +1,6 @@
 package com.toeic.online.domain;
 
+import com.toeic.online.service.dto.ClassroomStudentDTO;
 import java.io.Serializable;
 import javax.persistence.*;
 
@@ -91,5 +92,13 @@ public class ClassroomStudent implements Serializable {
             ", classCode='" + getClassCode() + "'" +
             ", studentCode='" + getStudentCode() + "'" +
             "}";
+    }
+
+    public ClassroomStudent() {}
+
+    public ClassroomStudent(ClassroomStudentDTO dto) {
+        this.id = dto.getId();
+        this.studentCode = dto.getStudentCode();
+        this.classCode = dto.getClassCode();
     }
 }

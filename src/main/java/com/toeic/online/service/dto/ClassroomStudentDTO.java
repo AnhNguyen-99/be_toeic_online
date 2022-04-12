@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ClassroomStudentDTO {
+public class ClassroomStudentDTO extends ExportDTO {
 
     private Long id;
     private String classCode;

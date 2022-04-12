@@ -1,6 +1,7 @@
 package com.toeic.online.repository;
 
 import com.toeic.online.domain.ClassroomStudent;
+import java.util.List;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.stereotype.Repository;
 
@@ -9,4 +10,7 @@ import org.springframework.stereotype.Repository;
  */
 @SuppressWarnings("unused")
 @Repository
-public interface ClassroomStudentRepository extends JpaRepository<ClassroomStudent, Long> {}
+public interface ClassroomStudentRepository extends JpaRepository<ClassroomStudent, Long> {
+    @Query(value = "SELECT * FROM classroom_student cs WHERE cs.class_code = ?1", nativeQuery = true)
+    List<ClassroomStudent> getListClassroomStudentByClassCode(String classCode);
+}

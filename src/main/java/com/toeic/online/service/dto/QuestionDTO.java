@@ -12,7 +12,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class QuestionDTO {
+public class QuestionDTO extends ExportDTO {
 
     private Long id;
     private String questionType;
@@ -28,4 +28,9 @@ public class QuestionDTO {
     private Instant updateDate;
     private String updateName;
     private List<ChoiceDTO> lstChoice;
+    private String choice1;
+    private String choice2;
+    private String choice3;
+    private String choice4;
+    private String choiceTrue;
 }
